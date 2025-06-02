@@ -1,0 +1,46 @@
+{
+  "extends": ["@commitlint/config-conventional"],
+  "rules": {
+    "scope-enum": [
+      2,
+      "always",
+      [
+        "cli",
+        "api",
+        "models",
+        "services",
+        "utils",
+        "docs",
+        "test",
+        "deps",
+        "release",
+        "workflow",
+        "config"
+      ]
+    ],
+    "body-max-line-length": [2, "always", 100],
+    "subject-case": [
+      2,
+      "never",
+      ["sentence-case", "start-case", "pascal-case", "upper-case"]
+    ],
+    "scope-case": [2, "always", "lower-case"],
+    "type-enum": [
+      2,
+      "always",
+      [
+        "feat",
+        "fix",
+        "docs",
+        "style",
+        "refactor",
+        "perf",
+        "test",
+        "build",
+        "ci",
+        "chore",
+        "revert"
+      ]
+    ]
+  }
+}

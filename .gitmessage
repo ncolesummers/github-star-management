@@ -1,0 +1,25 @@
+# <type>(<scope>): <short summary>
+#  │       │             │
+#  │       │             └─⫸ Summary in present tense. Not capitalized. No period at the end.
+#  │       │
+#  │       └─⫸ Commit Scope: cli|api|models|services|utils|docs|test|deps|release|workflow|config
+#  │
+#  └─⫸ Commit Type: feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert
+#
+# Optional body (explain WHY, not HOW):
+#
+# Optional footer(s):
+# Fixes #<issue number>
+# BREAKING CHANGE: <description>
+# ----------------------
+# Examples:
+#
+# feat(cli): add support for custom output formats
+#
+# fix(api): handle rate limiting errors properly
+#
+# docs(README): update installation instructions
+#
+# BREAKING CHANGE: config format has changed
+#
+# Fixes #123
