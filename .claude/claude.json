@@ -1,0 +1,74 @@
+{
+  "description": "GitHub Stars Management - Deno TypeScript project",
+  "commands": {
+    "api": {
+      "description": "API-related commands",
+      "commands": {
+        "stars-fetch": {
+          "description": "Implement GitHub stars fetch functionality",
+          "path": "./commands/api/github-stars-fetch.md"
+        },
+        "rate-limit": {
+          "description": "Implement rate limit handling for GitHub API",
+          "path": "./commands/api/rate-limit-handler.md"
+        }
+      }
+    },
+    "cli": {
+      "description": "CLI-related commands",
+      "commands": {
+        "add-command": {
+          "description": "Add a new CLI command",
+          "path": "./commands/cli/add-command.md"
+        }
+      }
+    },
+    "star": {
+      "description": "Star management commands",
+      "commands": {
+        "categorize": {
+          "description": "Implement star categorization algorithm",
+          "path": "./commands/star-management/categorize-stars.md"
+        },
+        "cleanup": {
+          "description": "Implement star cleanup strategy",
+          "path": "./commands/star-management/cleanup-stars.md"
+        }
+      }
+    },
+    "docs": {
+      "description": "Documentation commands",
+      "commands": {
+        "api": {
+          "description": "Generate API documentation",
+          "path": "./commands/documentation/generate-api-docs.md"
+        }
+      }
+    },
+    "workflow": {
+      "description": "Legacy workflow commands",
+      "commands": {
+        "api-feature": {
+          "description": "Implement a new GitHub API feature",
+          "path": "./workflows/implement-api-feature.md"
+        },
+        "add-cli-command": {
+          "description": "Add a new CLI command",
+          "path": "./workflows/add-cli-command.md"
+        },
+        "implement-tests": {
+          "description": "Implement tests for project components",
+          "path": "./workflows/implement-tests.md"
+        },
+        "generate-docs": {
+          "description": "Create or update project documentation",
+          "path": "./workflows/generate-documentation.md"
+        },
+        "shell-to-deno": {
+          "description": "Migrate shell scripts to Deno TypeScript",
+          "path": "./workflows/shell-to-deno-migration.md"
+        }
+      }
+    }
+  }
+}
