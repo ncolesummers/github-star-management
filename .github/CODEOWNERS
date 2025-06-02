@@ -1,0 +1,5 @@
+# GitHub Actions workflow files require approval from maintainers with DevOps expertise
+/.github/workflows/ @maintainers
+
+# GitHub configuration files require approval from repository owners
+/.github/ @owners

@@ -1,0 +1,94 @@
+name: Quarterly Star Cleanup
+
+on:
+  # Run quarterly on the 1st day of Jan, Apr, Jul, Oct at 9 AM UTC
+  schedule:
+    - cron: '0 9 1 1,4,7,10 *'
+  
+  # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (no actual changes)'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+      cutoff_months:
+        description: 'Months of inactivity before removal'
+        required: false
+        default: '24'
+        type: string
+
+jobs:
+  cleanup-stars:
+    runs-on: ubuntu-latest
+    name: Clean up old GitHub stars
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+      
+      - name: Set up environment
+        run: |
+          echo "DRY_RUN=${{ github.event.inputs.dry_run || 'true' }}" >> $GITHUB_ENV
+          echo "CUTOFF_MONTHS=${{ github.event.inputs.cutoff_months || '24' }}" >> $GITHUB_ENV
+      
+      - name: Run star cleanup
+        run: deno task start cleanup --dry-run=${{ env.DRY_RUN }} --cutoff-months=${{ env.CUTOFF_MONTHS }}
+        env:
+          # Use a dedicated token with limited scope for star management
+          GITHUB_TOKEN: ${{ secrets.STAR_MANAGEMENT_TOKEN }}
+      
+      - name: Create artifact with cleanup report
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cleanup-report
+          path: ./star-cleanup-report.json
+          retention-days: 90
+      
+      - name: Create issue if stars were removed
+        if: success() && env.DRY_RUN == 'false'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const date = new Date().toISOString().split('T')[0];
+            
+            // Try to read the report file if it exists
+            let reportSummary = "No detailed report available.";
+            try {
+              if (fs.existsSync('./star-cleanup-report.json')) {
+                const report = JSON.parse(fs.readFileSync('./star-cleanup-report.json', 'utf8'));
+                const removedCount = report.removed_stars?.length || 0;
+                const keptCount = report.kept_stars?.length || 0;
+                
+                reportSummary = `## Cleanup Summary\n\n` +
+                  `- Removed stars: ${removedCount}\n` +
+                  `- Kept stars: ${keptCount}\n\n` +
+                  `For detailed information, check the artifacts in the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
+              }
+            } catch (error) {
+              console.error('Error reading report:', error);
+            }
+            
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Star Cleanup Report - ${date}`,
+              body: `## Quarterly Star Cleanup Completed\n\n` +
+                `The automated star cleanup has run with cutoff set to ${process.env.CUTOFF_MONTHS} months.\n\n` +
+                `${reportSummary}`,
+              labels: ['automation', 'star-cleanup']
+            });
+            
+            console.log(`Created issue #${issue.data.number}`);

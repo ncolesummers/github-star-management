@@ -1,0 +1,130 @@
+name: Star Management Tools
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        type: choice
+        options:
+          - 'cleanup'
+          - 'report'
+          - 'backup'
+          - 'categorize'
+          - 'digest'
+      dry_run:
+        description: 'Dry run mode'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+      output_path:
+        description: 'Output path for backups and reports'
+        required: false
+        default: './output'
+        type: string
+
+jobs:
+  star-management:
+    runs-on: ubuntu-latest
+    name: Star Management - ${{ github.event.inputs.action }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+      
+      - name: Create output directory
+        run: mkdir -p ${{ github.event.inputs.output_path }}
+      
+      - name: Run selected action
+        env:
+          GITHUB_TOKEN: ${{ secrets.STAR_MANAGEMENT_TOKEN }}
+          ACTION: ${{ github.event.inputs.action }}
+          DRY_RUN: ${{ github.event.inputs.dry_run }}
+          OUTPUT_PATH: ${{ github.event.inputs.output_path }}
+        run: |
+          case "$ACTION" in
+            cleanup)
+              deno task start cleanup --dry-run=$DRY_RUN
+              ;;
+            report)
+              deno task start report --output=$OUTPUT_PATH/star-report.json
+              ;;
+            backup)
+              deno task start backup --output=$OUTPUT_PATH/stars-backup.json
+              ;;
+            categorize)
+              deno task start categorize --output-dir=$OUTPUT_PATH/star-categories
+              ;;
+            digest)
+              deno task start digest --output=$OUTPUT_PATH/star-digest.md
+              ;;
+          esac
+      
+      - name: Upload artifacts
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: star-management-output
+          path: ${{ github.event.inputs.output_path }}
+          retention-days: 30
+      
+      - name: Create result issue
+        if: success() && github.event.inputs.action != 'cleanup' && github.event.inputs.dry_run == 'false'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const date = new Date().toISOString().split('T')[0];
+            const action = process.env.ACTION.charAt(0).toUpperCase() + process.env.ACTION.slice(1);
+            
+            let resultSummary = "Operation completed successfully.";
+            const outputPath = process.env.OUTPUT_PATH;
+            
+            // Try to get summary from the output files based on the action
+            try {
+              if (process.env.ACTION === 'report' && fs.existsSync(`${outputPath}/star-report.json`)) {
+                const report = JSON.parse(fs.readFileSync(`${outputPath}/star-report.json`, 'utf8'));
+                resultSummary = `## Report Summary\n\n` +
+                  `- Total stars: ${report.total_stars || 0}\n` +
+                  `- Active repositories: ${report.active_repos || 0}\n` +
+                  `- Archived repositories: ${report.archived_repos || 0}\n` +
+                  `- Languages breakdown: Top ${Object.keys(report.languages || {}).slice(0, 5).join(', ')}\n\n`;
+              } else if (process.env.ACTION === 'backup' && fs.existsSync(`${outputPath}/stars-backup.json`)) {
+                const backup = JSON.parse(fs.readFileSync(`${outputPath}/stars-backup.json`, 'utf8'));
+                resultSummary = `## Backup Summary\n\n` +
+                  `- Total stars backed up: ${backup.length || 0}\n` +
+                  `- Backup timestamp: ${date}\n\n`;
+              } else if (process.env.ACTION === 'digest' && fs.existsSync(`${outputPath}/star-digest.md`)) {
+                resultSummary = `## Digest Created\n\n` +
+                  `A new star digest has been created and is available in the workflow artifacts.\n\n`;
+              } else if (process.env.ACTION === 'categorize' && fs.existsSync(`${outputPath}/star-categories`)) {
+                const categories = fs.readdirSync(`${outputPath}/star-categories`).filter(f => f.endsWith('.md'));
+                resultSummary = `## Categorization Summary\n\n` +
+                  `- Categories created: ${categories.length}\n` +
+                  `- Categories: ${categories.map(c => c.replace('.md', '')).join(', ')}\n\n`;
+              }
+            } catch (error) {
+              console.error('Error reading result files:', error);
+            }
+            
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Star ${action} Results - ${date}`,
+              body: `## Star ${action} Operation Completed\n\n` +
+                `${resultSummary}\n\n` +
+                `Results are available in the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) artifacts.`,
+              labels: ['automation', `star-${process.env.ACTION}`]
+            });
+            
+            console.log(`Created issue #${issue.data.number}`);
