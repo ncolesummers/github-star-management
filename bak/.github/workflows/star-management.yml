@@ -1,0 +1,60 @@
+name: Star Management Tools
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        type: choice
+        options:
+          - 'cleanup'
+          - 'report'
+          - 'backup'
+          - 'analyze'
+      dry_run:
+        description: 'Dry run mode'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+jobs:
+  star-management:
+    runs-on: ubuntu-latest
+    name: Star Management - ${{ github.event.inputs.action }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+      
+      - name: Run selected action
+        env:
+          GITHUB_TOKEN: ${{ secrets.STAR_MANAGEMENT_TOKEN }}
+          ACTION: ${{ github.event.inputs.action }}
+          DRY_RUN: ${{ github.event.inputs.dry_run }}
+        run: |
+          case "$ACTION" in
+            cleanup)
+              ./scripts/cleanup-stars.sh
+              ;;
+            report)
+              ./scripts/generate-report.sh
+              ;;
+            backup)
+              ./scripts/backup-stars.sh
+              ;;
+            analyze)
+              ./scripts/analyze-stars.sh
+              ;;
+          esac

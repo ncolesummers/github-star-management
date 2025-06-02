@@ -1,0 +1,40 @@
+name: Notify on Cleanup
+
+on:
+  workflow_run:
+    workflows: ["Quarterly Star Cleanup"]
+    types:
+      - completed
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    
+    steps:
+      - name: Send notification
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            // Create a notification issue
+            const { data: runs } = await github.rest.actions.listWorkflowRuns({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'star-cleanup.yml',
+              per_page: 1
+            });
+            
+            if (runs.workflow_runs.length > 0) {
+              const run = runs.workflow_runs[0];
+              
+              // Get the summary from the run
+              const { data: jobs } = await github.rest.actions.listJobsForWorkflowRun({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                run_id: run.id
+              });
+              
+              // You can also send a notification to Slack, Discord, etc.
+              console.log(`Star cleanup completed at ${run.created_at}`);
+            }
