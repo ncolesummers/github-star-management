@@ -1,6 +1,6 @@
 /**
  * Type definitions and models
- * 
+ *
  * This module exports TypeScript interfaces and types for GitHub entities
  * and application-specific models.
  */

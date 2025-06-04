@@ -2,7 +2,9 @@
 
 ## Overview
 
-This document details the command-line interface (CLI) implementation for the GitHub Star Management tool. The CLI provides a user-friendly interface to interact with all star management functionality.
+This document details the command-line interface (CLI) implementation for the
+GitHub Star Management tool. The CLI provides a user-friendly interface to
+interact with all star management functionality.
 
 ## Command Architecture
 
@@ -14,9 +16,12 @@ star-management <command> [subcommand] [options]
 
 ### Core Components
 
-1. **Command Parser**: Uses Deno's `@std/cli` module to parse command-line arguments
-2. **Command Registry**: Central registry of all available commands and their handlers
-3. **Command Handlers**: Individual implementations of each command's functionality
+1. **Command Parser**: Uses Deno's `@std/cli` module to parse command-line
+   arguments
+2. **Command Registry**: Central registry of all available commands and their
+   handlers
+3. **Command Handlers**: Individual implementations of each command's
+   functionality
 4. **Output Formatter**: Handles consistent, styled console output
 5. **Error Handler**: Standardized error handling and reporting
 
@@ -51,9 +56,9 @@ export const COMMANDS: Record<string, CommandDefinition> = {
     examples: [
       "cleanup --dry-run",
       "cleanup --cutoff-months 12",
-      "cleanup --exclude owner/repo1,owner/repo2"
+      "cleanup --exclude owner/repo1,owner/repo2",
     ],
-    aliases: ["clean"]
+    aliases: ["clean"],
   },
   "backup": {
     handler: backup,
@@ -62,8 +67,8 @@ export const COMMANDS: Record<string, CommandDefinition> = {
     examples: [
       "backup",
       "backup --output stars-backup.json",
-      "backup --compress"
-    ]
+      "backup --compress",
+    ],
   },
   // ...other commands
 };
@@ -104,7 +109,7 @@ export interface CommandContext {
 }
 
 export type CommandHandler = (
-  ctx: CommandContext
+  ctx: CommandContext,
 ) => Promise<number> | number;
 ```
 
@@ -116,7 +121,7 @@ A typical command implementation:
 // src/cli/commands/cleanup.ts
 import { parse } from "@std/cli";
 import { StarService } from "../../core/services/star_service.ts";
-import { formatOutput, formatError } from "../utils/format.ts";
+import { formatError, formatOutput } from "../utils/format.ts";
 import { CommandHandler } from "../types.ts";
 
 export const clean: CommandHandler = async (ctx) => {
@@ -129,13 +134,13 @@ export const clean: CommandHandler = async (ctx) => {
       d: "dry-run",
       c: "cutoff-months",
       e: "exclude",
-      v: "verbose"
+      v: "verbose",
     },
     default: {
       "dry-run": false,
       "cutoff-months": "24",
-      "verbose": false
-    }
+      "verbose": false,
+    },
   });
 
   // Show help if requested
@@ -165,7 +170,7 @@ export const clean: CommandHandler = async (ctx) => {
     // Create service and run cleanup
     const token = ctx.env.GITHUB_TOKEN || ctx.env.STAR_MANAGEMENT_TOKEN;
     const service = new StarService({ token });
-    
+
     const result = await service.cleanupStars({
       cutoffMonths,
       dryRun,
@@ -180,7 +185,10 @@ export const clean: CommandHandler = async (ctx) => {
     formatOutput(ctx, `   - Stars removed: ${result.removed}`);
     formatOutput(ctx, `   - Archived repositories: ${result.archived}`);
     formatOutput(ctx, `   - Outdated repositories: ${result.outdated}`);
-    formatOutput(ctx, `   - Stars remaining: ${result.totalReviewed - result.removed}`);
+    formatOutput(
+      ctx,
+      `   - Stars remaining: ${result.totalReviewed - result.removed}`,
+    );
 
     return 0;
   } catch (error) {
@@ -190,7 +198,9 @@ export const clean: CommandHandler = async (ctx) => {
 };
 
 function showHelp(ctx: CommandContext): void {
-  formatOutput(ctx, `
+  formatOutput(
+    ctx,
+    `
 GitHub Star Cleanup
 
 USAGE:
@@ -207,7 +217,8 @@ EXAMPLES:
   star-management cleanup --dry-run
   star-management cleanup --cutoff-months 12
   star-management cleanup --exclude owner/repo1,owner/repo2
-`);
+`,
+  );
 }
 ```
 
@@ -220,12 +231,14 @@ Below is the complete list of commands implemented in the CLI:
 Remove stars from archived or outdated repositories.
 
 **Options:**
+
 - `--dry-run, -d`: Run without making changes
 - `--cutoff-months, -c`: Months of inactivity before removal (default: 24)
 - `--exclude, -e`: Comma-separated list of repos to exclude (owner/name format)
 - `--verbose, -v`: Show detailed output
 
 **Examples:**
+
 ```bash
 star-management cleanup --dry-run
 star-management cleanup --cutoff-months 12
@@ -237,12 +250,14 @@ star-management cleanup --exclude owner/repo1,owner/repo2
 Backup all starred repositories to a file.
 
 **Options:**
+
 - `--output, -o`: Output file path (default: star-backup-YYYY-MM-DD.json)
 - `--compress, -c`: Compress output file with gzip
 - `--format, -f`: Output format (json, csv, md) (default: json)
 - `--verbose, -v`: Show detailed output
 
 **Examples:**
+
 ```bash
 star-management backup
 star-management backup --output stars.json
@@ -255,12 +270,14 @@ star-management backup --format md
 Restore stars from a backup file.
 
 **Options:**
+
 - `--input, -i`: Input file path
 - `--dry-run, -d`: Preview what would be restored without making changes
 - `--delay, -l`: Milliseconds to wait between operations (default: 500)
 - `--verbose, -v`: Show detailed output
 
 **Examples:**
+
 ```bash
 star-management restore --input star-backup-2023-01-01.json
 star-management restore --input star-backup.json.gz --dry-run
@@ -272,12 +289,14 @@ star-management restore --input backup.json --delay 1000
 Categorize stars into topical lists.
 
 **Options:**
+
 - `--output-dir, -o`: Output directory (default: star-lists)
 - `--format, -f`: Output format (md, json) (default: md)
 - `--config, -c`: Path to category configuration file
 - `--verbose, -v`: Show detailed output
 
 **Examples:**
+
 ```bash
 star-management categorize
 star-management categorize --output-dir my-stars
@@ -290,12 +309,14 @@ star-management categorize --config categories.json
 Generate a star report with statistics.
 
 **Options:**
+
 - `--output, -o`: Output file path (default: star-report-YYYY-MM-DD.md)
 - `--format, -f`: Output format (md, json, html) (default: md)
 - `--include-chart, -c`: Include charts in the report (html or md format only)
 - `--verbose, -v`: Show detailed output
 
 **Examples:**
+
 ```bash
 star-management report
 star-management report --output report.html --format html
@@ -307,6 +328,7 @@ star-management report --include-chart
 Generate a digest of trending repositories.
 
 **Options:**
+
 - `--interests, -i`: Comma-separated list of interests (default from config)
 - `--output, -o`: Output file path (default: star-digest-YYYY-MM-DD.md)
 - `--limit, -l`: Number of repos per interest (default: 5)
@@ -314,6 +336,7 @@ Generate a digest of trending repositories.
 - `--verbose, -v`: Show detailed output
 
 **Examples:**
+
 ```bash
 star-management digest
 star-management digest --interests typescript,python,golang
@@ -338,12 +361,12 @@ export interface FormatOptions {
 export function formatOutput(
   ctx: CommandContext,
   message: string,
-  options: FormatOptions = {}
+  options: FormatOptions = {},
 ): void {
   const { prefix = "", indent = 0 } = options;
   const indentStr = " ".repeat(indent);
   const prefixStr = prefix ? `${prefix} ` : "";
-  
+
   const encoder = new TextEncoder();
   const text = encoder.encode(`${indentStr}${prefixStr}${message}\n`);
   Deno.writeAllSync(ctx.stdout as Deno.Writer, text);
@@ -352,13 +375,13 @@ export function formatOutput(
 export function formatError(
   ctx: CommandContext,
   message: string,
-  options: FormatOptions = {}
+  options: FormatOptions = {},
 ): void {
   const { prefix = "❌", indent = 0 } = options;
-  
+
   const encoder = new TextEncoder();
   const text = encoder.encode(
-    `${" ".repeat(indent)}${prefix} ${chalk.red(message)}\n`
+    `${" ".repeat(indent)}${prefix} ${chalk.red(message)}\n`,
   );
   Deno.writeAllSync(ctx.stderr as Deno.Writer, text);
 }
@@ -366,33 +389,33 @@ export function formatError(
 export function formatSuccess(
   ctx: CommandContext,
   message: string,
-  options: FormatOptions = {}
+  options: FormatOptions = {},
 ): void {
   formatOutput(ctx, chalk.green(message), {
     prefix: options.prefix || "✅",
-    indent: options.indent
+    indent: options.indent,
   });
 }
 
 export function formatWarning(
   ctx: CommandContext,
   message: string,
-  options: FormatOptions = {}
+  options: FormatOptions = {},
 ): void {
   formatOutput(ctx, chalk.yellow(message), {
     prefix: options.prefix || "⚠️",
-    indent: options.indent
+    indent: options.indent,
   });
 }
 
 export function formatInfo(
   ctx: CommandContext,
   message: string,
-  options: FormatOptions = {}
+  options: FormatOptions = {},
 ): void {
   formatOutput(ctx, chalk.blue(message), {
     prefix: options.prefix || "ℹ️",
-    indent: options.indent
+    indent: options.indent,
   });
 }
 
@@ -400,33 +423,33 @@ export function formatTable(
   ctx: CommandContext,
   headers: string[],
   rows: string[][],
-  options: FormatOptions = {}
+  options: FormatOptions = {},
 ): void {
   // Calculate column widths
   const colWidths = headers.map((h, i) => {
-    const values = [h, ...rows.map(r => r[i] || "")];
-    return Math.max(...values.map(v => v.length)) + 2;
+    const values = [h, ...rows.map((r) => r[i] || "")];
+    return Math.max(...values.map((v) => v.length)) + 2;
   });
-  
+
   // Format header
   let header = "";
   headers.forEach((h, i) => {
     header += chalk.bold(h.padEnd(colWidths[i]));
   });
-  
+
   // Format rows
-  const formattedRows = rows.map(row => {
+  const formattedRows = rows.map((row) => {
     let formattedRow = "";
     row.forEach((cell, i) => {
       formattedRow += cell.padEnd(colWidths[i]);
     });
     return formattedRow;
   });
-  
+
   // Output
   formatOutput(ctx, header, options);
   formatOutput(ctx, "─".repeat(header.length), options);
-  formattedRows.forEach(row => {
+  formattedRows.forEach((row) => {
     formatOutput(ctx, row, options);
   });
 }
@@ -436,13 +459,15 @@ export function formatProgressBar(
   current: number,
   total: number,
   width = 40,
-  options: FormatOptions = {}
+  options: FormatOptions = {},
 ): void {
   const percent = total > 0 ? Math.floor((current / total) * 100) : 0;
   const filled = Math.floor((width * current) / total);
   const empty = width - filled;
-  
-  const bar = `[${"█".repeat(filled)}${" ".repeat(empty)}] ${current}/${total} (${percent}%)`;
+
+  const bar = `[${"█".repeat(filled)}${
+    " ".repeat(empty)
+  }] ${current}/${total} (${percent}%)`;
   formatOutput(ctx, bar, options);
 }
 ```
@@ -455,7 +480,7 @@ The CLI supports configuration from multiple sources:
 // src/cli/config.ts
 import { parse as parseYaml } from "jsr:@std/yaml";
 import { exists } from "jsr:@std/fs/exists";
-import { join, dirname } from "jsr:@std/path";
+import { dirname, join } from "jsr:@std/path";
 import { z } from "npm:zod";
 
 // Define configuration schema
@@ -466,14 +491,14 @@ const ConfigSchema = z.object({
     z.object({
       name: z.string(),
       pattern: z.string(),
-      displayName: z.string().optional()
-    })
+      displayName: z.string().optional(),
+    }),
   ).optional(),
   interests: z.array(z.string()).optional(),
   cleanup: z.object({
     cutoffMonths: z.number().optional(),
-    excludeList: z.array(z.string()).optional()
-  }).optional()
+    excludeList: z.array(z.string()).optional(),
+  }).optional(),
 });
 
 export type Config = z.infer<typeof ConfigSchema>;
@@ -484,12 +509,12 @@ export async function loadConfig(): Promise<Config> {
   // 2. Config file in current directory
   // 3. Config file in home directory
   // 4. Default values
-  
+
   const config: Config = {
     categories: DEFAULT_CATEGORIES,
-    interests: DEFAULT_INTERESTS
+    interests: DEFAULT_INTERESTS,
   };
-  
+
   // Try loading from config file
   const configPaths = [
     "./.star-management.json",
@@ -499,19 +524,19 @@ export async function loadConfig(): Promise<Config> {
     join(Deno.env.get("HOME") || "~", ".star-management.yaml"),
     join(Deno.env.get("HOME") || "~", ".star-management.yml"),
   ];
-  
+
   for (const path of configPaths) {
     if (await exists(path)) {
       try {
         const content = await Deno.readTextFile(path);
         let fileConfig: unknown;
-        
+
         if (path.endsWith(".json")) {
           fileConfig = JSON.parse(content);
         } else {
           fileConfig = parseYaml(content);
         }
-        
+
         // Validate and merge config
         const parsed = ConfigSchema.parse(fileConfig);
         Object.assign(config, parsed);
@@ -521,33 +546,46 @@ export async function loadConfig(): Promise<Config> {
       }
     }
   }
-  
+
   // Override with environment variables
   if (Deno.env.get("GITHUB_TOKEN")) {
     config.token = Deno.env.get("GITHUB_TOKEN");
   } else if (Deno.env.get("STAR_MANAGEMENT_TOKEN")) {
     config.token = Deno.env.get("STAR_MANAGEMENT_TOKEN");
   }
-  
+
   if (Deno.env.get("STAR_RATE_LIMIT")) {
     config.rateLimit = parseInt(Deno.env.get("STAR_RATE_LIMIT") || "10", 10);
   }
-  
+
   return config;
 }
 
 // Default categories (same as shell script)
 const DEFAULT_CATEGORIES = [
-  { name: "ai", pattern: "ai|machine-learning|ml|deep-learning|neural|llm|gpt|transformer|nlp" },
-  { name: "web-servers", pattern: "server|http|nginx|apache|caddy|express|fastapi|flask" },
+  {
+    name: "ai",
+    pattern:
+      "ai|machine-learning|ml|deep-learning|neural|llm|gpt|transformer|nlp",
+  },
+  {
+    name: "web-servers",
+    pattern: "server|http|nginx|apache|caddy|express|fastapi|flask",
+  },
   { name: "standards", pattern: "rfc|spec|standard|protocol|w3c|ecma" },
   { name: "awesome-lists", pattern: "awesome-|awesome |curated|list" },
   { name: "typescript", pattern: "typescript|ts|deno|tsx" },
   { name: "python", pattern: "python|py|django|flask|fastapi|pandas|numpy" },
   { name: "golang", pattern: "golang|go-|go |gin|echo|fiber" },
   { name: "testing", pattern: "test|testing|jest|pytest|mocha|cypress" },
-  { name: "devops", pattern: "docker|kubernetes|k8s|ci-cd|jenkins|github-actions" },
-  { name: "databases", pattern: "database|db|sql|postgres|mysql|mongodb|redis" }
+  {
+    name: "devops",
+    pattern: "docker|kubernetes|k8s|ci-cd|jenkins|github-actions",
+  },
+  {
+    name: "databases",
+    pattern: "database|db|sql|postgres|mysql|mongodb|redis",
+  },
 ];
 
 const DEFAULT_INTERESTS = [
@@ -555,7 +593,7 @@ const DEFAULT_INTERESTS = [
   "python",
   "golang",
   "ai",
-  "devops"
+  "devops",
 ];
 ```
 
@@ -566,8 +604,8 @@ The main entry point that ties everything together:
 ```typescript
 // src/cli/mod.ts
 import { parse } from "@std/cli";
-import { COMMANDS, COMMAND_ALIASES, resolveCommand } from "./commands/mod.ts";
-import { formatOutput, formatError } from "./utils/format.ts";
+import { COMMAND_ALIASES, COMMANDS, resolveCommand } from "./commands/mod.ts";
+import { formatError, formatOutput } from "./utils/format.ts";
 import { loadConfig } from "./config.ts";
 import chalk from "chalk";
 
@@ -581,22 +619,22 @@ export async function main(args: string[]): Promise<void> {
     },
     "--": true,
   });
-  
+
   // Handle --help and --version flags
   if (parsedArgs.help) {
     showHelp();
     Deno.exit(0);
   }
-  
+
   if (parsedArgs.version) {
     showVersion();
     Deno.exit(0);
   }
-  
+
   // Get command name
   const commandName = parsedArgs._[0] ? String(parsedArgs._[0]) : "";
   const resolvedCommand = resolveCommand(commandName);
-  
+
   if (!commandName || !resolvedCommand) {
     if (commandName) {
       console.error(chalk.red(`Unknown command: ${commandName}`));
@@ -604,10 +642,10 @@ export async function main(args: string[]): Promise<void> {
     showHelp();
     Deno.exit(1);
   }
-  
+
   // Load config
   const config = await loadConfig();
-  
+
   // Prepare context
   const commandDef = COMMANDS[resolvedCommand];
   const ctx = {
@@ -620,7 +658,7 @@ export async function main(args: string[]): Promise<void> {
       GITHUB_TOKEN: config.token || Deno.env.get("GITHUB_TOKEN") || "",
     },
   };
-  
+
   try {
     // Run the command
     const exitCode = await commandDef.handler(ctx);
@@ -642,9 +680,13 @@ ${chalk.bold("USAGE")}
   star-management <command> [options]
 
 ${chalk.bold("COMMANDS")}
-${Object.entries(COMMANDS)
-  .map(([name, def]) => `  ${chalk.green(name.padEnd(15))}${def.description}`)
-  .join("\n")}
+${
+    Object.entries(COMMANDS)
+      .map(([name, def]) =>
+        `  ${chalk.green(name.padEnd(15))}${def.description}`
+      )
+      .join("\n")
+  }
 
 ${chalk.bold("GLOBAL OPTIONS")}
   --help, -h        Show help information
@@ -696,28 +738,29 @@ The CLI supports command aliases for better usability:
 
 To generate command documentation from the code:
 
-```typescript
+````typescript
 // scripts/generate-docs.ts
 import { COMMANDS } from "../src/cli/commands/mod.ts";
 
 async function generateCommandDocs() {
   let markdown = "# Star Management CLI Reference\n\n";
-  
+
   markdown += "## Overview\n\n";
-  markdown += "The Star Management CLI provides tools for managing your GitHub stars.\n\n";
+  markdown +=
+    "The Star Management CLI provides tools for managing your GitHub stars.\n\n";
   markdown += "## Commands\n\n";
-  
+
   for (const [name, def] of Object.entries(COMMANDS)) {
     markdown += `### \`${name}\`\n\n`;
     markdown += `${def.description}\n\n`;
-    
+
     if (def.aliases && def.aliases.length > 0) {
       markdown += `**Aliases:** ${def.aliases.join(", ")}\n\n`;
     }
-    
+
     markdown += "**Usage:**\n";
     markdown += `\`\`\`bash\nstar-management ${def.usage}\n\`\`\`\n\n`;
-    
+
     if (def.examples && def.examples.length > 0) {
       markdown += "**Examples:**\n";
       markdown += "```bash\n";
@@ -727,7 +770,7 @@ async function generateCommandDocs() {
       markdown += "```\n\n";
     }
   }
-  
+
   await Deno.writeTextFile("docs/command-reference.md", markdown);
   console.log("Command reference documentation generated");
 }
@@ -735,7 +778,7 @@ async function generateCommandDocs() {
 if (import.meta.main) {
   await generateCommandDocs();
 }
-```
+````
 
 ## Interactive Mode
 
@@ -743,25 +786,25 @@ The CLI can also support an interactive mode for better usability:
 
 ```typescript
 // src/cli/utils/interactive.ts
-import { Input, Select, Confirm } from "jsr:@cliffy/prompt";
+import { Confirm, Input, Select } from "jsr:@cliffy/prompt";
 import chalk from "chalk";
 
 export async function promptToken(): Promise<string> {
   return await Input.prompt({
     message: "Enter your GitHub token:",
     type: "password",
-    validate: (value) => value ? true : "Token is required"
+    validate: (value) => value ? true : "Token is required",
   });
 }
 
 export async function promptCategories(
-  defaults: { name: string; pattern: string; displayName?: string }[]
+  defaults: { name: string; pattern: string; displayName?: string }[],
 ): Promise<{ name: string; pattern: string; displayName?: string }[]> {
   console.log(chalk.bold("Configure star categories:"));
-  
+
   const categories = [...defaults];
   let editing = true;
-  
+
   while (editing) {
     const action = await Select.prompt({
       message: "Category actions:",
@@ -769,100 +812,107 @@ export async function promptCategories(
         { name: "Add new category", value: "add" },
         { name: "Edit existing category", value: "edit" },
         { name: "Remove category", value: "remove" },
-        { name: "Done", value: "done" }
-      ]
+        { name: "Done", value: "done" },
+      ],
     });
-    
+
     switch (action) {
       case "add":
         const name = await Input.prompt("Category name:");
         const pattern = await Input.prompt("Search pattern (regex):");
         const displayName = await Input.prompt({
           message: "Display name (optional):",
-          default: name.charAt(0).toUpperCase() + name.slice(1)
+          default: name.charAt(0).toUpperCase() + name.slice(1),
         });
-        
+
         categories.push({ name, pattern, displayName });
         break;
-        
+
       case "edit":
         if (categories.length === 0) {
           console.log(chalk.yellow("No categories to edit"));
           break;
         }
-        
+
         const editIndex = await Select.prompt({
           message: "Select category to edit:",
           options: categories.map((cat, i) => ({
             name: `${cat.name} (${cat.pattern})`,
-            value: i.toString()
-          }))
+            value: i.toString(),
+          })),
         });
-        
+
         const catIndex = parseInt(editIndex, 10);
         const cat = categories[catIndex];
-        
+
         categories[catIndex] = {
-          name: await Input.prompt({ message: "Category name:", default: cat.name }),
-          pattern: await Input.prompt({ message: "Search pattern:", default: cat.pattern }),
+          name: await Input.prompt({
+            message: "Category name:",
+            default: cat.name,
+          }),
+          pattern: await Input.prompt({
+            message: "Search pattern:",
+            default: cat.pattern,
+          }),
           displayName: await Input.prompt({
             message: "Display name (optional):",
-            default: cat.displayName
-          })
+            default: cat.displayName,
+          }),
         };
         break;
-        
+
       case "remove":
         if (categories.length === 0) {
           console.log(chalk.yellow("No categories to remove"));
           break;
         }
-        
+
         const removeIndex = await Select.prompt({
           message: "Select category to remove:",
           options: categories.map((cat, i) => ({
             name: cat.name,
-            value: i.toString()
-          }))
+            value: i.toString(),
+          })),
         });
-        
+
         categories.splice(parseInt(removeIndex, 10), 1);
         break;
-        
+
       case "done":
         editing = false;
         break;
     }
   }
-  
+
   return categories;
 }
 
 // Example usage in a command
 async function setupConfig(ctx: CommandContext): Promise<number> {
   console.log(chalk.bold("GitHub Star Management Configuration"));
-  
+
   // Load existing config or use defaults
   const config = await loadConfig();
-  
+
   // Prompt for GitHub token
   const token = await promptToken();
-  
+
   // Prompt for categories
   const categories = await promptCategories(
-    config.categories || DEFAULT_CATEGORIES
+    config.categories || DEFAULT_CATEGORIES,
   );
-  
+
   // Save configuration
   const newConfig = {
     token,
-    categories
+    categories,
   };
-  
-  await Deno.writeTextFile(".star-management.json", 
-    JSON.stringify(newConfig, null, 2)
+
+  await Deno.writeTextFile(
+    ".star-management.json",
+    JSON.stringify(newConfig, null, 2),
   );
-  
+
   formatSuccess(ctx, "Configuration saved to .star-management.json");
   return 0;
 }

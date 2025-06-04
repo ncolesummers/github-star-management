@@ -1,6 +1,7 @@
 # Generate Documentation
 
-This workflow guides you through creating or updating documentation for the GitHub Stars Management project.
+This workflow guides you through creating or updating documentation for the
+GitHub Stars Management project.
 
 ## Workflow Steps
 
@@ -42,7 +43,7 @@ This workflow guides you through creating or updating documentation for the GitH
 
 ## Example: CLI Command Documentation
 
-```markdown
+````markdown
 # Star Management CLI Reference
 
 ## Overview
@@ -57,18 +58,23 @@ backup, categorization, reporting, and cleanup operations.
 Remove stars from archived or outdated repositories.
 
 **Usage:**
+
 ```bash
 star-management cleanup [options]
 ```
+````
 
 **Options:**
+
 - `--dry-run`, `-d`: Run without making changes
 - `--cutoff-months`, `-c`: Months of inactivity before removal (default: 24)
-- `--exclude`, `-e`: Comma-separated list of repos to exclude (owner/name format)
+- `--exclude`, `-e`: Comma-separated list of repos to exclude (owner/name
+  format)
 - `--verbose`, `-v`: Show detailed output
 - `--help`, `-h`: Show this help message
 
 **Examples:**
+
 ```bash
 star-management cleanup --dry-run
 star-management cleanup --cutoff-months 12
@@ -80,20 +86,25 @@ star-management cleanup --exclude owner/repo1,owner/repo2
 Backup all starred repositories to a file.
 
 **Usage:**
+
 ```bash
 star-management backup [options]
 ```
 
 **Options:**
+
 - `--output`, `-o`: Output file path (default: star-backup-YYYY-MM-DD.json)
 - `--compress`, `-c`: Compress output file with gzip
 - `--format`, `-f`: Output format (json, csv, md) (default: json)
 - `--verbose`, `-v`: Show detailed output
 
 **Examples:**
+
 ```bash
 star-management backup
 star-management backup --output stars.json
 star-management backup --compress
+```
+
 ```
 ```

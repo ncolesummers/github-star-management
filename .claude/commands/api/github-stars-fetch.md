@@ -1,6 +1,8 @@
 # Implement GitHub Stars Fetch Functionality for $ARGUMENTS
 
-You're implementing a robust GitHub stars fetching mechanism with pagination and error handling. The $ARGUMENTS parameter specifies any specific requirements or constraints for the implementation.
+You're implementing a robust GitHub stars fetching mechanism with pagination and
+error handling. The $ARGUMENTS parameter specifies any specific requirements or
+constraints for the implementation.
 
 Follow these steps:
 

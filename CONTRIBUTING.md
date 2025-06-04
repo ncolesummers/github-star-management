@@ -1,6 +1,7 @@
 # Contributing to GitHub Star Management
 
-Thank you for your interest in contributing to GitHub Star Management! This document provides guidelines and instructions for contributing to this project.
+Thank you for your interest in contributing to GitHub Star Management! This
+document provides guidelines and instructions for contributing to this project.
 
 ## Table of Contents
 
@@ -18,7 +19,10 @@ Thank you for your interest in contributing to GitHub Star Management! This docu
 
 ## Code of Conduct
 
-This project and everyone participating in it is governed by our [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to the project maintainers.
+This project and everyone participating in it is governed by our
+[Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to
+uphold this code. Please report unacceptable behavior to the project
+maintainers.
 
 ## Getting Started
 
@@ -47,7 +51,8 @@ This project and everyone participating in it is governed by our [Code of Conduc
 
 ## Development Environment
 
-We use Deno as our runtime, which has built-in TypeScript support, testing, formatting, and linting.
+We use Deno as our runtime, which has built-in TypeScript support, testing,
+formatting, and linting.
 
 To run the various tasks:
 
@@ -114,11 +119,15 @@ github-star-management/
 
 ## Commit Guidelines
 
-We strictly follow the [Conventional Commits](https://www.conventionalcommits.org/) specification for commit messages. This enables automatic versioning, changelog generation, and helps organize the project history.
+We strictly follow the
+[Conventional Commits](https://www.conventionalcommits.org/) specification for
+commit messages. This enables automatic versioning, changelog generation, and
+helps organize the project history.
 
 ### Commit Message Format
 
-Each commit message consists of a **header**, an optional **body**, and an optional **footer**:
+Each commit message consists of a **header**, an optional **body**, and an
+optional **footer**:
 
 ```
 <type>(<scope>): <short summary>
@@ -135,7 +144,8 @@ The type must be one of the following:
 - `feat`: A new feature
 - `fix`: A bug fix
 - `docs`: Documentation only changes
-- `style`: Changes that do not affect the meaning of the code (white-space, formatting, etc.)
+- `style`: Changes that do not affect the meaning of the code (white-space,
+  formatting, etc.)
 - `refactor`: A code change that neither fixes a bug nor adds a feature
 - `perf`: A code change that improves performance
 - `test`: Adding missing tests or correcting existing tests
@@ -146,7 +156,8 @@ The type must be one of the following:
 
 #### Scope
 
-The scope should specify the part of the codebase affected by the changes. Examples:
+The scope should specify the part of the codebase affected by the changes.
+Examples:
 
 - `cli`
 - `api`
@@ -156,7 +167,8 @@ The scope should specify the part of the codebase affected by the changes. Examp
 - `docs`
 - `test`
 
-Scopes should be lowercase and use hyphens for multi-word scopes (e.g., `rate-limit`).
+Scopes should be lowercase and use hyphens for multi-word scopes (e.g.,
+`rate-limit`).
 
 #### Summary
 
@@ -169,7 +181,8 @@ The summary (or description) is a brief description of the change:
 
 #### Body
 
-The body should include the motivation for the change and contrast this with previous behavior:
+The body should include the motivation for the change and contrast this with
+previous behavior:
 
 - Use imperative, present tense
 - Include detailed descriptions of what changed and why
@@ -178,7 +191,8 @@ The body should include the motivation for the change and contrast this with pre
 
 #### Footer
 
-The footer should contain information about Breaking Changes and reference GitHub issues that this commit closes or is related to:
+The footer should contain information about Breaking Changes and reference
+GitHub issues that this commit closes or is related to:
 
 - Breaking changes should start with `BREAKING CHANGE:`
 - Reference issues at the bottom with `Fixes #123` or `Closes #123`
@@ -187,11 +201,13 @@ The footer should contain information about Breaking Changes and reference GitHu
 ### Examples
 
 #### Simple Feature
+
 ```
 feat(cli): add --verbose flag to backup command
 ```
 
 #### Bug Fix With Issue Reference
+
 ```
 fix(api): handle rate limit errors correctly
 
@@ -202,6 +218,7 @@ Closes #123
 ```
 
 #### Breaking Change
+
 ```
 feat(services): refactor star service interface
 
@@ -210,12 +227,15 @@ a config object parameter instead of individual arguments.
 ```
 
 #### Documentation Update
+
 ```
 docs(README): update installation instructions for Windows
 ```
 
 #### Multiple Scopes
+
 If a change affects multiple scopes, you can use comma-separated scopes:
+
 ```
 feat(api,services): implement new rate limiting strategy
 ```
@@ -224,12 +244,15 @@ feat(api,services): implement new rate limiting strategy
 
 We recommend using the following tools to help with conventional commits:
 
-- [commitlint](https://github.com/conventional-changelog/commitlint): Validates commit messages
-- [commitizen](https://github.com/commitizen/cz-cli): Interactive CLI for creating conventional commits
+- [commitlint](https://github.com/conventional-changelog/commitlint): Validates
+  commit messages
+- [commitizen](https://github.com/commitizen/cz-cli): Interactive CLI for
+  creating conventional commits
 
 #### Setting Up the Commit Template
 
-We provide a git commit template to help you write conventional commits. To use it:
+We provide a git commit template to help you write conventional commits. To use
+it:
 
 ```bash
 # Set up the commit template
@@ -271,9 +294,12 @@ This project enforces conventional commits through:
 
 ## Pull Request Process
 
-1. Ensure any install or build dependencies are removed before the end of the layer when doing a build.
-2. Update the README.md or documentation with details of changes to the interface.
-3. The pull request will be merged once you have the sign-off of at least one maintainer.
+1. Ensure any install or build dependencies are removed before the end of the
+   layer when doing a build.
+2. Update the README.md or documentation with details of changes to the
+   interface.
+3. The pull request will be merged once you have the sign-off of at least one
+   maintainer.
 
 ### Pull Request Checklist
 
@@ -287,15 +313,18 @@ Before submitting your pull request, make sure to:
 
 ## Testing
 
-We use Deno's built-in testing framework. Tests should be placed in the `tests/` directory.
+We use Deno's built-in testing framework. Tests should be placed in the `tests/`
+directory.
 
 ### Unit Tests
 
-Unit tests should be placed in `tests/unit/` and should test individual components in isolation.
+Unit tests should be placed in `tests/unit/` and should test individual
+components in isolation.
 
 ### Integration Tests
 
-Integration tests should be placed in `tests/integration/` and should test how components work together.
+Integration tests should be placed in `tests/integration/` and should test how
+components work together.
 
 To run tests:
 
@@ -325,7 +354,8 @@ Our release process follows these steps:
 
 ## Community
 
-Join our community! Here are some ways to get involved beyond code contributions:
+Join our community! Here are some ways to get involved beyond code
+contributions:
 
 - Help users by answering questions
 - Improve documentation

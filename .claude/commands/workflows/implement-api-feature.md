@@ -1,6 +1,7 @@
 # Implement GitHub API Feature
 
-This workflow guides you through implementing a new GitHub API feature in the Deno TypeScript project.
+This workflow guides you through implementing a new GitHub API feature in the
+Deno TypeScript project.
 
 ## Workflow Steps
 

@@ -1,6 +1,7 @@
 # Add New CLI Command
 
-This workflow guides you through adding a new command to the GitHub Stars Management CLI.
+This workflow guides you through adding a new command to the GitHub Stars
+Management CLI.
 
 ## Workflow Steps
 

@@ -31,20 +31,20 @@ export async function main(args: string[]): Promise<void> {
     console.log(`GitHub Star Management v${VERSION}`);
     Deno.exit(0);
   }
-  
+
   // Get command name (first argument)
   const command = parsedArgs._.length > 0 ? String(parsedArgs._[0]) : "";
-  
+
   if (!command) {
     showHelp();
     Deno.exit(0);
   }
-  
+
   // This is a placeholder for command handling
   // In the future, we'll implement a command registry and handlers
   console.log(chalk.yellow(`Command '${command}' not yet implemented.`));
   console.log("Coming soon! Check back for updates.");
-  
+
   Deno.exit(0);
 }
 

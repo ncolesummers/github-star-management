@@ -2,7 +2,11 @@
 
 ## Executive Summary
 
-This research document provides a comprehensive overview of Claude Code custom commands, including their structure, organization, and optimization techniques based on official documentation and early adopter experiences. The document aims to help the GitHub Stars Management project implement effective command structures and workflows to maximize Claude Code's capabilities.
+This research document provides a comprehensive overview of Claude Code custom
+commands, including their structure, organization, and optimization techniques
+based on official documentation and early adopter experiences. The document aims
+to help the GitHub Stars Management project implement effective command
+structures and workflows to maximize Claude Code's capabilities.
 
 ## Table of Contents
 
@@ -15,13 +19,21 @@ This research document provides a comprehensive overview of Claude Code custom c
 
 ## Introduction to Claude Code Custom Commands
 
-Claude Code offers a powerful system for creating custom commands that can be used to automate repetitive tasks, standardize workflows, and improve team collaboration. These commands are stored as Markdown files in specific directories and can be invoked through slash commands in the Claude Code interface.
+Claude Code offers a powerful system for creating custom commands that can be
+used to automate repetitive tasks, standardize workflows, and improve team
+collaboration. These commands are stored as Markdown files in specific
+directories and can be invoked through slash commands in the Claude Code
+interface.
 
 There are two primary types of custom commands:
-- **Project-specific commands**: Available only within a specific project, stored in `.claude/commands/`
-- **Global commands**: Available across all projects, stored in `~/.claude/commands/`
+
+- **Project-specific commands**: Available only within a specific project,
+  stored in `.claude/commands/`
+- **Global commands**: Available across all projects, stored in
+  `~/.claude/commands/`
 
 Custom commands enhance workflow efficiency by:
+
 - Standardizing complex processes
 - Reducing context window usage for repetitive tasks
 - Allowing parameterization through the `$ARGUMENTS` keyword
@@ -32,7 +44,8 @@ Custom commands enhance workflow efficiency by:
 
 ### File Structure
 
-The `.claude` directory serves as the central configuration hub for Claude Code in a project:
+The `.claude` directory serves as the central configuration hub for Claude Code
+in a project:
 
 ```
 .claude/
@@ -52,12 +65,14 @@ The `.claude` directory serves as the central configuration hub for Claude Code 
 
 ### Command Format
 
-Commands are written in Markdown files with clear, instructional content. The `$ARGUMENTS` keyword can be used to pass parameters from the command invocation.
+Commands are written in Markdown files with clear, instructional content. The
+`$ARGUMENTS` keyword can be used to pass parameters from the command invocation.
 
 Example command file (`.claude/commands/fix-issue.md`):
 
 ```markdown
 Find and fix issue #$ARGUMENTS. Follow these steps:
+
 1. Understand the issue described in the ticket
 2. Locate the relevant code in our codebase
 3. Implement a solution that addresses the root cause
@@ -69,7 +84,9 @@ This command would be invoked as `/project:fix-issue 123` to address issue #123.
 
 ### Role-Based Commands
 
-Role-based commands allow Claude to adopt specific expertise profiles when performing tasks. These roles are defined in the `.claude/roles/` directory and can be referenced in commands.
+Role-based commands allow Claude to adopt specific expertise profiles when
+performing tasks. These roles are defined in the `.claude/roles/` directory and
+can be referenced in commands.
 
 Example role file (`.claude/roles/deno-api-specialist.md`):
 
@@ -77,15 +94,21 @@ Example role file (`.claude/roles/deno-api-specialist.md`):
 # Deno API Specialist
 
 ## Role Definition
-You are a Senior API Developer with 10+ years of experience developing RESTful APIs, with specialized expertise in Deno TypeScript and GitHub's API ecosystem. You've built dozens of API clients for major platforms and have extensive knowledge of rate limiting, pagination, error handling, and response processing.
+
+You are a Senior API Developer with 10+ years of experience developing RESTful
+APIs, with specialized expertise in Deno TypeScript and GitHub's API ecosystem.
+You've built dozens of API clients for major platforms and have extensive
+knowledge of rate limiting, pagination, error handling, and response processing.
 
 ## Expertise
+
 - Expert knowledge of GitHub's REST API v3
 - Deep understanding of Deno's fetch API and network capabilities
 - Extensive experience implementing token bucket rate limiting
 - Mastery of TypeScript type systems for API response modeling
 
 ## Responsibilities
+
 - Design and implement the GitHub API client for the Stars Management project
 - Create TypeScript interfaces for GitHub API responses
 - Implement robust rate limiting and pagination
@@ -94,14 +117,16 @@ You are a Senior API Developer with 10+ years of experience developing RESTful A
 
 ### Workflow Definitions
 
-Complex workflows can be defined in the `.claude/workflows/` directory to guide Claude through multi-step processes.
+Complex workflows can be defined in the `.claude/workflows/` directory to guide
+Claude through multi-step processes.
 
 Example workflow file (`.claude/workflows/implement-api-feature.md`):
 
 ```markdown
 # Implement GitHub API Feature
 
-This workflow guides you through implementing a new GitHub API feature in the Deno TypeScript project.
+This workflow guides you through implementing a new GitHub API feature in the
+Deno TypeScript project.
 
 ## Workflow Steps
 
@@ -127,7 +152,8 @@ This workflow guides you through implementing a new GitHub API feature in the De
 
 ### Parameterized Commands
 
-Commands can be made more flexible by using the `$ARGUMENTS` keyword to accept parameters:
+Commands can be made more flexible by using the `$ARGUMENTS` keyword to accept
+parameters:
 
 ```markdown
 # Generate a TypeScript interface for $ARGUMENTS
@@ -141,7 +167,8 @@ Commands can be made more flexible by using the `$ARGUMENTS` keyword to accept p
 
 ### Extended Thinking Integration
 
-Commands can leverage Claude's extended thinking capabilities for complex problems:
+Commands can leverage Claude's extended thinking capabilities for complex
+problems:
 
 ```markdown
 # Analyze Architecture Decision for $ARGUMENTS
@@ -156,6 +183,7 @@ Think deeply about the architectural implications of $ARGUMENTS. Consider:
 ```
 
 The specific trigger words map to increasing thinking budget:
+
 - "think" → 4,000 tokens
 - "think hard" → 10,000 tokens
 - "think harder" → 20,000 tokens
@@ -165,15 +193,19 @@ The specific trigger words map to increasing thinking budget:
 
 Complex operations can be broken down into multiple commands that work together:
 
-1. `.claude/commands/analyze-stars.md` - Analyzes starred repositories and generates categories
-2. `.claude/commands/generate-report.md` - Creates a report based on the analysis
-3. `.claude/commands/cleanup-recommendations.md` - Suggests repositories to unstar
+1. `.claude/commands/analyze-stars.md` - Analyzes starred repositories and
+   generates categories
+2. `.claude/commands/generate-report.md` - Creates a report based on the
+   analysis
+3. `.claude/commands/cleanup-recommendations.md` - Suggests repositories to
+   unstar
 
 ## Integration with Project Workflows
 
 ### CLAUDE.md Integration
 
-The `CLAUDE.md` file serves as a central reference point for Claude. It should include:
+The `CLAUDE.md` file serves as a central reference point for Claude. It should
+include:
 
 - Project overview and structure
 - Development environment setup
@@ -182,7 +214,8 @@ The `CLAUDE.md` file serves as a central reference point for Claude. It should i
 - Code style guidelines
 - Important project-specific context
 
-Commands can reference information in the `CLAUDE.md` file to maintain consistency.
+Commands can reference information in the `CLAUDE.md` file to maintain
+consistency.
 
 ### GitHub Workflow Integration
 
@@ -218,10 +251,13 @@ Commands can enforce test-driven development practices:
 
 Early adopters recommend:
 
-1. **Hierarchical Organization**: Organize commands in subdirectories by function (API, CLI, Testing, Documentation)
-2. **Role-Based Approach**: Create specialized roles for different aspects of development
+1. **Hierarchical Organization**: Organize commands in subdirectories by
+   function (API, CLI, Testing, Documentation)
+2. **Role-Based Approach**: Create specialized roles for different aspects of
+   development
 3. **Workflow Automation**: Define complex workflows as separate files
-4. **Parameter Standardization**: Use consistent parameter patterns across commands
+4. **Parameter Standardization**: Use consistent parameter patterns across
+   commands
 
 ### Command Design Principles
 
@@ -239,12 +275,15 @@ For command maintenance:
 
 1. **Version Control**: Include commands in git repositories for team sharing
 2. **Documentation**: Maintain a catalog of available commands with descriptions
-3. **Regular Updates**: Review and update commands as project requirements evolve
-4. **Deprecation Strategy**: Clearly mark deprecated commands and provide alternatives
+3. **Regular Updates**: Review and update commands as project requirements
+   evolve
+4. **Deprecation Strategy**: Clearly mark deprecated commands and provide
+   alternatives
 
 ## Recommendations for Optimization
 
-Based on our research and analysis of the GitHub Stars Management project, we recommend the following optimizations:
+Based on our research and analysis of the GitHub Stars Management project, we
+recommend the following optimizations:
 
 ### 1. Restructure Command Organization
 
@@ -350,13 +389,19 @@ Standardize command naming and invocation:
 
 ## Conclusion
 
-Claude Code custom commands offer a powerful mechanism for enhancing development workflows, especially for specialized tasks like GitHub Stars Management. By implementing the recommendations outlined in this document, the project can optimize command organization, improve role definitions, and create more effective workflows.
+Claude Code custom commands offer a powerful mechanism for enhancing development
+workflows, especially for specialized tasks like GitHub Stars Management. By
+implementing the recommendations outlined in this document, the project can
+optimize command organization, improve role definitions, and create more
+effective workflows.
 
 The most significant improvements will come from:
+
 1. Hierarchical command organization by domain
 2. Enhanced role definitions for specialized expertise
 3. Test-driven development integration
 4. Extended thinking optimization for complex tasks
 5. Comprehensive project context in CLAUDE.md
 
-These optimizations will result in more efficient development, higher code quality, and better team collaboration through standardized workflows.
+These optimizations will result in more efficient development, higher code
+quality, and better team collaboration through standardized workflows.

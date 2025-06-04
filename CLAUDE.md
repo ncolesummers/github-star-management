@@ -1,10 +1,12 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with
+code in this repository.
 
 ## Repository Overview
 
-This repository contains documentation and tools for managing GitHub stars, implemented in Deno TypeScript. The project provides tools for:
+This repository contains documentation and tools for managing GitHub stars,
+implemented in Deno TypeScript. The project provides tools for:
 
 1. Viewing, managing, and organizing GitHub stars
 2. Cleaning up outdated or archived starred repositories
@@ -32,6 +34,7 @@ The repository follows a modular architecture:
 - `/bak` - Contains the original shell script implementation (archived)
 
 Key documentation:
+
 - `README.md` - Project overview and usage instructions
 - `CONTRIBUTING.md` - Contribution guidelines
 - `CODE_OF_CONDUCT.md` - Community code of conduct
@@ -116,7 +119,8 @@ The Deno implementation provides several improvements:
 
 ## GitHub Action Setup
 
-The repository includes (or will include) GitHub Actions for automated star management:
+The repository includes (or will include) GitHub Actions for automated star
+management:
 
 1. Quarterly cleanup of stars
 2. Manual star management tools
@@ -143,23 +147,30 @@ When developing in this repository:
    deno task test
    ```
 
-4. The repository uses Deno's JSR and npm compatibility for dependencies, specified in deno.json.
+4. The repository uses Deno's JSR and npm compatibility for dependencies,
+   specified in deno.json.
 
 ### Test-Driven Development
 
-This project follows test-driven development (TDD) principles. When implementing new features:
+This project follows test-driven development (TDD) principles. When implementing
+new features:
 
-1. **Write tests first**: Always start by writing tests that define the expected behavior.
+1. **Write tests first**: Always start by writing tests that define the expected
+   behavior.
 2. **Use mocks for API calls**: Create mock responses for GitHub API requests.
-3. **Test edge cases**: Include tests for error scenarios, empty responses, and edge cases.
-4. **Run tests frequently**: Use `deno task test` to verify your changes as you work.
-5. **Maintain high coverage**: Aim for high test coverage, especially for core API and service logic.
+3. **Test edge cases**: Include tests for error scenarios, empty responses, and
+   edge cases.
+4. **Run tests frequently**: Use `deno task test` to verify your changes as you
+   work.
+5. **Maintain high coverage**: Aim for high test coverage, especially for core
+   API and service logic.
 
 Example test pattern:
+
 ```typescript
 // Arrange - Set up test data and mocks
 const service = new StarService();
-const mockRepo = createMockRepository({ /* properties */ });
+const mockRepo = createMockRepository({/* properties */});
 
 // Act - Call the method being tested
 const result = await service.categorizeRepository(mockRepo);
@@ -171,31 +182,39 @@ assertEquals(result[0].name, "Expected Category");
 
 ### Conventional Commits
 
-This repository strictly follows the [Conventional Commits](https://www.conventionalcommits.org/) specification. All commit messages must follow this format:
+This repository strictly follows the
+[Conventional Commits](https://www.conventionalcommits.org/) specification. All
+commit messages must follow this format:
 
 ```
 <type>(<scope>): <short summary>
 ```
 
 Where:
-- `type` is one of: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
-- `scope` is one of: cli, api, models, services, utils, docs, test, deps, release, workflow, config
+
+- `type` is one of: feat, fix, docs, style, refactor, perf, test, build, ci,
+  chore, revert
+- `scope` is one of: cli, api, models, services, utils, docs, test, deps,
+  release, workflow, config
 - `summary` is a brief description of the change
 
 Example commit messages:
+
 ```
 feat(cli): add support for custom output formats
 fix(api): handle rate limiting errors properly
 docs(README): update installation instructions
 ```
 
-For more details, see the [Commit Guidelines](CONTRIBUTING.md#commit-guidelines) section in the CONTRIBUTING.md file.
+For more details, see the [Commit Guidelines](CONTRIBUTING.md#commit-guidelines)
+section in the CONTRIBUTING.md file.
 
 ## Star Management Guidelines
 
 ### Star Categorization
 
 When categorizing stars, follow these principles:
+
 1. Use repository topics as primary signals
 2. Consider repository description and README content
 3. Look at programming languages used
@@ -203,6 +222,7 @@ When categorizing stars, follow these principles:
 5. Check for related repositories in the same category
 
 Preferred categories should include:
+
 - Development Tools
 - Libraries & Frameworks
 - Documentation & Learning
@@ -215,6 +235,7 @@ Preferred categories should include:
 ### Star Cleanup Criteria
 
 When identifying stars for potential removal, consider:
+
 1. Last update time (2+ years with no updates is a candidate)
 2. Archived repositories (usually safe to remove)
 3. Forks that haven't diverged from originals
@@ -226,6 +247,7 @@ Always back up stars before cleanup operations.
 ### Report Generation
 
 Star reports should include:
+
 1. Total star count and distribution by category
 2. Growth trends over time
 3. Language distribution
@@ -238,10 +260,12 @@ Star reports should include:
 ### Rate Limiting Considerations
 
 GitHub API has strict rate limits:
+
 - 5,000 requests per hour for authenticated requests
 - 60 requests per hour for unauthenticated requests
 
 Implementation guidelines:
+
 1. Always check the `x-ratelimit-remaining` header
 2. Implement exponential backoff when approaching limits
 3. Use the `If-None-Match` header with ETags when possible
@@ -251,17 +275,21 @@ Implementation guidelines:
 ### Pagination Handling
 
 Many GitHub API endpoints return paginated results:
+
 1. Use the Link header to determine if more pages exist
 2. Request the maximum items per page (100) to minimize requests
 3. Implement automatic pagination handling in API clients
-4. Consider parallel requests for faster processing (but be careful with rate limits)
+4. Consider parallel requests for faster processing (but be careful with rate
+   limits)
 
 ## Important Notes
 
 1. GitHub API tokens should never be hardcoded in scripts.
-2. Always respect GitHub's rate limits with appropriate rate limiting mechanisms.
+2. Always respect GitHub's rate limits with appropriate rate limiting
+   mechanisms.
 3. Ensure cross-platform compatibility for all implementation.
-4. Tests should include mocks for API responses to avoid hitting real GitHub API limits.
+4. Tests should include mocks for API responses to avoid hitting real GitHub API
+   limits.
 5. All commits must follow the conventional commits format.
 6. Documentation should be kept up-to-date with code changes.
 7. New features should include corresponding tests and documentation.

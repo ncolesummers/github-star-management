@@ -1,6 +1,7 @@
 # Test-Driven Feature Implementation
 
-This workflow guides you through implementing a new feature for the GitHub Stars Management project using test-driven development (TDD) principles.
+This workflow guides you through implementing a new feature for the GitHub Stars
+Management project using test-driven development (TDD) principles.
 
 ## Workflow Steps
 
@@ -47,7 +48,7 @@ First, create a test file for the new feature:
 
 ```typescript
 // tests/unit/services/star_categorization_test.ts
-import { assertEquals, assertArrayIncludes } from "../../deps.ts";
+import { assertArrayIncludes, assertEquals } from "../../deps.ts";
 import { CategorizationService } from "../../../src/core/services/categorization_service.ts";
 import { createMockRepository } from "../../fixtures/repositories.ts";
 
@@ -58,12 +59,12 @@ Deno.test("CategorizationService - categorizeRepository - should categorize by t
     name: "awesome-tool",
     topics: ["developer-tools", "cli"],
     language: "TypeScript",
-    description: "A command-line tool for developers"
+    description: "A command-line tool for developers",
   });
-  
+
   // Act
   const categories = service.categorizeRepository(repo);
-  
+
   // Assert
   assertEquals(categories.length, 1);
   assertEquals(categories[0].name, "Development Tools");
@@ -77,14 +78,18 @@ Deno.test("CategorizationService - categorizeRepository - should handle reposito
     name: "some-library",
     topics: [],
     language: "JavaScript",
-    description: "A useful library for something"
+    description: "A useful library for something",
   });
-  
+
   // Act
   const categories = service.categorizeRepository(repo);
-  
+
   // Assert
-  assertEquals(categories.length > 0, true, "Should assign at least one category");
+  assertEquals(
+    categories.length > 0,
+    true,
+    "Should assign at least one category",
+  );
 });
 
 Deno.test("CategorizationService - categorizeRepository - should handle repositories with multiple matching categories", () => {
@@ -94,17 +99,24 @@ Deno.test("CategorizationService - categorizeRepository - should handle reposito
     name: "dev-framework",
     topics: ["framework", "developer-tools"],
     language: "TypeScript",
-    description: "A framework for building developer tools"
+    description: "A framework for building developer tools",
   });
-  
+
   // Act
   const categories = service.categorizeRepository(repo);
-  
+
   // Assert
-  assertEquals(categories.length >= 2, true, "Should match multiple categories");
-  const categoryNames = categories.map(c => c.name);
-  assertArrayIncludes(categoryNames, ["Development Tools", "Libraries & Frameworks"]);
-  
+  assertEquals(
+    categories.length >= 2,
+    true,
+    "Should match multiple categories",
+  );
+  const categoryNames = categories.map((c) => c.name);
+  assertArrayIncludes(categoryNames, [
+    "Development Tools",
+    "Libraries & Frameworks",
+  ]);
+
   // First category should have highest confidence
   assertEquals(categories[0].confidence >= categories[1].confidence, true);
 });
@@ -143,8 +155,12 @@ export class CategorizationService {
         { type: "topic", value: "ide", weight: 9 },
         { type: "topic", value: "debugging", weight: 7 },
         { type: "language", value: "shell", weight: 3 },
-        { type: "description", pattern: /\b(developer|development)\s+tool\b/i, weight: 5 },
-      ]
+        {
+          type: "description",
+          pattern: /\b(developer|development)\s+tool\b/i,
+          weight: 5,
+        },
+      ],
     },
     {
       name: "Libraries & Frameworks",
@@ -153,18 +169,18 @@ export class CategorizationService {
         { type: "topic", value: "framework", weight: 10 },
         { type: "topic", value: "sdk", weight: 8 },
         { type: "description", pattern: /\b(library|framework)\b/i, weight: 5 },
-      ]
+      ],
     },
     // Additional categories would be defined here
   ];
-  
+
   categorizeRepository(repo: Repository): RepositoryCategory[] {
     const scores = new Map<string, number>();
-    
+
     // Calculate score for each category
     for (const category of this.categories) {
       let score = 0;
-      
+
       for (const pattern of category.patterns) {
         switch (pattern.type) {
           case "topic":
@@ -184,37 +200,40 @@ export class CategorizationService {
             break;
         }
       }
-      
+
       if (score > 0) {
         scores.set(category.name, score);
       }
     }
-    
+
     // If no categories matched, try to infer from other metadata
     if (scores.size === 0) {
       this.inferCategoriesFromMetadata(repo, scores);
     }
-    
+
     // Convert scores to categories with confidence
     const maxScore = Math.max(...Array.from(scores.values(), 0));
     const results: RepositoryCategory[] = [];
-    
+
     for (const [name, score] of scores.entries()) {
       const confidence = score / maxScore;
       if (confidence >= 0.3) { // Minimum confidence threshold
         results.push({
           name,
           confidence,
-          score
+          score,
         });
       }
     }
-    
+
     // Sort by confidence descending
     return results.sort((a, b) => b.confidence - a.confidence);
   }
-  
-  private inferCategoriesFromMetadata(repo: Repository, scores: Map<string, number>): void {
+
+  private inferCategoriesFromMetadata(
+    repo: Repository,
+    scores: Map<string, number>,
+  ): void {
     // Fallback categorization logic when no direct matches
     if (repo.language) {
       // Infer category from language
@@ -225,20 +244,23 @@ export class CategorizationService {
       }
       // Add more language-based inferences as needed
     }
-    
+
     // Infer from name patterns
     if (repo.name.toLowerCase().includes("awesome")) {
       scores.set("Collections & Lists", 5);
     }
-    
+
     // Infer from description
     if (repo.description) {
       const desc = repo.description.toLowerCase();
-      if (desc.includes("learning") || desc.includes("tutorial") || desc.includes("course")) {
+      if (
+        desc.includes("learning") || desc.includes("tutorial") ||
+        desc.includes("course")
+      ) {
         scores.set("Learning Resources", 5);
       }
     }
-    
+
     // If still no categories, add a generic one
     if (scores.size === 0) {
       scores.set("Uncategorized", 1);
@@ -256,22 +278,32 @@ After implementing and testing the feature, integrate it with the CLI:
 program
   .command("stars:categorize")
   .description("Categorize your starred repositories")
-  .option("-o, --output <format:string>", "Output format: 'table', 'json', 'md'", "table")
-  .option("-m, --min-confidence <confidence:number>", "Minimum confidence threshold", 0.5)
+  .option(
+    "-o, --output <format:string>",
+    "Output format: 'table', 'json', 'md'",
+    "table",
+  )
+  .option(
+    "-m, --min-confidence <confidence:number>",
+    "Minimum confidence threshold",
+    0.5,
+  )
   .action(async (options) => {
     try {
       const starService = new StarService();
       const categorizationService = new CategorizationService();
       const allStars = await starService.getStars();
-      
-      const categorized = allStars.map(repo => {
+
+      const categorized = allStars.map((repo) => {
         const categories = categorizationService.categorizeRepository(repo);
         return {
           repo,
-          categories: categories.filter(c => c.confidence >= options.minConfidence)
+          categories: categories.filter((c) =>
+            c.confidence >= options.minConfidence
+          ),
         };
       });
-      
+
       // Format and display results based on output format
       // Implementation details would go here
     } catch (error) {

@@ -1,12 +1,15 @@
 # Implement Star Categorization Algorithm: $ARGUMENTS
 
-You're implementing an algorithm to automatically categorize GitHub starred repositories. The $ARGUMENTS parameter specifies the categorization approach or specific requirements.
+You're implementing an algorithm to automatically categorize GitHub starred
+repositories. The $ARGUMENTS parameter specifies the categorization approach or
+specific requirements.
 
 Follow these steps:
 
 1. **Categorization Strategy Analysis**
    - Understand the categorization approach specified in $ARGUMENTS
-   - Identify available metadata for categorization (topics, description, language)
+   - Identify available metadata for categorization (topics, description,
+     language)
    - Consider how to handle repositories with ambiguous signals
    - Think deeply about category hierarchy and relationships
 
@@ -48,8 +51,12 @@ export class CategorizationService {
         { type: "topic", value: "ide", weight: 9 },
         { type: "topic", value: "debugging", weight: 7 },
         { type: "language", value: "shell", weight: 3 },
-        { type: "description", pattern: /\b(developer|development)\s+tool\b/i, weight: 5 },
-      ]
+        {
+          type: "description",
+          pattern: /\b(developer|development)\s+tool\b/i,
+          weight: 5,
+        },
+      ],
     },
     {
       name: "Libraries & Frameworks",
@@ -58,18 +65,18 @@ export class CategorizationService {
         { type: "topic", value: "framework", weight: 10 },
         { type: "topic", value: "sdk", weight: 8 },
         { type: "description", pattern: /\b(library|framework)\b/i, weight: 5 },
-      ]
+      ],
     },
     // Additional categories defined here
   ];
-  
+
   categorizeRepository(repo: Repository): RepositoryCategory[] {
     const scores = new Map<string, number>();
-    
+
     // Calculate score for each category
     for (const category of this.categories) {
       let score = 0;
-      
+
       for (const pattern of category.patterns) {
         switch (pattern.type) {
           case "topic":
@@ -89,27 +96,27 @@ export class CategorizationService {
             break;
         }
       }
-      
+
       if (score > 0) {
         scores.set(category.name, score);
       }
     }
-    
+
     // Convert scores to categories with confidence
     const maxScore = Math.max(...Array.from(scores.values(), 0));
     const results: RepositoryCategory[] = [];
-    
+
     for (const [name, score] of scores.entries()) {
       const confidence = score / maxScore;
       if (confidence >= 0.3) { // Minimum confidence threshold
         results.push({
           name,
           confidence,
-          score
+          score,
         });
       }
     }
-    
+
     // Sort by confidence descending
     return results.sort((a, b) => b.confidence - a.confidence);
   }

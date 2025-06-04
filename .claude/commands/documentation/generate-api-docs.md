@@ -1,6 +1,8 @@
 # Generate API Documentation for $ARGUMENTS
 
-You're generating comprehensive API documentation for the GitHub Stars Management project. The $ARGUMENTS parameter specifies the component or module to document.
+You're generating comprehensive API documentation for the GitHub Stars
+Management project. The $ARGUMENTS parameter specifies the component or module
+to document.
 
 Follow these steps:
 
@@ -38,16 +40,18 @@ Follow these steps:
 
 For the GitHub API client, the documentation should include:
 
-```markdown
+````markdown
 # GitHub API Client
 
-The `GitHubClient` class provides a type-safe interface to GitHub's REST API v3, with specific focus on star management operations.
+The `GitHubClient` class provides a type-safe interface to GitHub's REST API v3,
+with specific focus on star management operations.
 
 ## Constructor
 
 ```typescript
 constructor(options: GitHubClientOptions)
 ```
+````
 
 Creates a new GitHub API client instance.
 
@@ -55,14 +59,15 @@ Creates a new GitHub API client instance.
 
 - `options`: Configuration options for the client
   - `token`: GitHub personal access token
-  - `baseUrl`: Optional custom API base URL (defaults to 'https://api.github.com')
+  - `baseUrl`: Optional custom API base URL (defaults to
+    'https://api.github.com')
   - `userAgent`: Optional custom user agent
 
 ### Example
 
 ```typescript
 const client = new GitHubClient({
-  token: Deno.env.get("GITHUB_TOKEN")
+  token: Deno.env.get("GITHUB_TOKEN"),
 });
 ```
 
@@ -96,19 +101,22 @@ An array of `Repository` objects representing the starred repositories.
 ```typescript
 // Get all stars, sorted by most recently starred first
 const stars = await client.getStarredRepositories({
-  sort: 'created',
-  direction: 'desc'
+  sort: "created",
+  direction: "desc",
 });
 
 // Get all stars, sorted by recently updated first
 const recentlyUpdated = await client.getStarredRepositories({
-  sort: 'updated',
-  direction: 'desc'
+  sort: "updated",
+  direction: "desc",
 });
 ```
 
 #### Rate Limiting
 
-This method handles pagination automatically and implements rate limit awareness. If rate limits are approaching, the method will slow down requests to avoid hitting limits.
+This method handles pagination automatically and implements rate limit
+awareness. If rate limits are approaching, the method will slow down requests to
+avoid hitting limits.
+
 ```
 ```

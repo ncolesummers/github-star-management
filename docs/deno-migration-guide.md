@@ -12,7 +12,9 @@
 
 ## Introduction
 
-This guide outlines the migration of the GitHub Stars Management project from shell scripts to a modern Deno TypeScript implementation. The migration aims to improve:
+This guide outlines the migration of the GitHub Stars Management project from
+shell scripts to a modern Deno TypeScript implementation. The migration aims to
+improve:
 
 - **Type safety** with TypeScript
 - **Cross-platform compatibility** through Deno's platform-agnostic design
@@ -24,7 +26,8 @@ This guide outlines the migration of the GitHub Stars Management project from sh
 
 ## Architecture Overview
 
-The new Deno-based architecture follows a modular design with clean separation of concerns:
+The new Deno-based architecture follows a modular design with clean separation
+of concerns:
 
 ```
 github-star-management/
@@ -268,7 +271,7 @@ export class GitHubAPIError extends Error {
   constructor(
     message: string,
     public status: number,
-    public response?: Response
+    public response?: Response,
   ) {
     super(message);
     this.name = "GitHubAPIError";
@@ -283,15 +286,18 @@ export class GitHubClient {
   constructor(options: GitHubClientOptions = {}) {
     this.token = options.token || Deno.env.get("GITHUB_TOKEN") || "";
     this.baseUrl = options.baseUrl || "https://api.github.com";
-    
+
     if (options.rateLimit) {
-      this.rateLimiter = new TokenBucket(options.rateLimit * 2, options.rateLimit);
+      this.rateLimiter = new TokenBucket(
+        options.rateLimit * 2,
+        options.rateLimit,
+      );
     }
   }
 
   private async request<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit = {},
   ): Promise<T> {
     // Wait for rate limit token if needed
     if (this.rateLimiter) {
@@ -301,13 +307,13 @@ export class GitHubClient {
     const url = endpoint.startsWith("http")
       ? endpoint
       : `${this.baseUrl}${endpoint}`;
-      
+
     const headers = new Headers(options.headers);
     if (this.token) {
       headers.set("Authorization", `token ${this.token}`);
     }
     headers.set("Accept", "application/vnd.github.v3+json");
-    
+
     const response = await fetch(url, {
       ...options,
       headers,
@@ -317,7 +323,7 @@ export class GitHubClient {
       throw new GitHubAPIError(
         `GitHub API error: ${response.status} ${response.statusText}`,
         response.status,
-        response
+        response,
       );
     }
 
@@ -331,11 +337,11 @@ export class GitHubClient {
     direction?: "asc" | "desc";
   } = {}): Promise<any[]> {
     const { page = 1, perPage = 100, sort, direction } = options;
-    
+
     let url = `/user/starred?page=${page}&per_page=${perPage}`;
     if (sort) url += `&sort=${sort}`;
     if (direction) url += `&direction=${direction}`;
-    
+
     return this.request<any[]>(url);
   }
 
@@ -343,15 +349,15 @@ export class GitHubClient {
     const allRepos: any[] = [];
     let page = 1;
     let hasMore = true;
-    
+
     while (hasMore) {
       const repos = await this.getStarredRepos({ page });
       allRepos.push(...repos);
-      
+
       hasMore = repos.length > 0;
       page++;
     }
-    
+
     return allRepos;
   }
 
@@ -384,42 +390,44 @@ Create a rate limiter utility in `src/utils/rate_limit.ts`:
 export class TokenBucket {
   private tokens: number;
   private lastRefill: number;
-  
+
   constructor(
     private capacity: number,
     private refillRate: number, // tokens per second
-    private refillInterval: number = 1000 // milliseconds
+    private refillInterval: number = 1000, // milliseconds
   ) {
     this.tokens = capacity;
     this.lastRefill = Date.now();
   }
-  
+
   private refill(): void {
     const now = Date.now();
     const timePassed = now - this.lastRefill;
-    const tokensToAdd = Math.floor((timePassed / this.refillInterval) * this.refillRate);
-    
+    const tokensToAdd = Math.floor(
+      (timePassed / this.refillInterval) * this.refillRate,
+    );
+
     if (tokensToAdd > 0) {
       this.tokens = Math.min(this.capacity, this.tokens + tokensToAdd);
       this.lastRefill = now;
     }
   }
-  
+
   async consume(tokens = 1): Promise<void> {
     this.refill();
-    
+
     if (this.tokens >= tokens) {
       this.tokens -= tokens;
       return;
     }
-    
+
     // Calculate how long to wait for enough tokens
     const tokensNeeded = tokens - this.tokens;
     const timeToWait = (tokensNeeded / this.refillRate) * this.refillInterval;
-    
+
     // Wait for tokens to become available
-    await new Promise(resolve => setTimeout(resolve, timeToWait));
-    
+    await new Promise((resolve) => setTimeout(resolve, timeToWait));
+
     this.refill(); // Refill after waiting
     this.tokens -= tokens;
   }
@@ -501,7 +509,13 @@ Create the star service in `src/core/services/star_service.ts`:
 ```typescript
 // src/core/services/star_service.ts
 import { GitHubClient } from "../api/github.ts";
-import type { Repository, Category, StarReport, LanguageDistribution, ActivityReport } from "../models/mod.ts";
+import type {
+  ActivityReport,
+  Category,
+  LanguageDistribution,
+  Repository,
+  StarReport,
+} from "../models/mod.ts";
 
 export class StarService {
   private client: GitHubClient;
@@ -520,9 +534,9 @@ export class StarService {
   async backupStars(outputPath: string): Promise<void> {
     const stars = await this.getAllStars();
     const jsonData = JSON.stringify(stars, null, 2);
-    
+
     await Deno.writeTextFile(outputPath, jsonData);
-    
+
     // Optional: Compress the file
     const gzipCommand = new Deno.Command("gzip", {
       args: ["-f", outputPath],
@@ -532,7 +546,7 @@ export class StarService {
 
   async restoreStars(backupFile: string): Promise<void> {
     let data: string;
-    
+
     if (backupFile.endsWith(".gz")) {
       // Uncompress first
       const gunzipCommand = new Deno.Command("gunzip", {
@@ -544,16 +558,16 @@ export class StarService {
     } else {
       data = await Deno.readTextFile(backupFile);
     }
-    
+
     const stars = JSON.parse(data) as Repository[];
-    
+
     // Star each repository
     for (const repo of stars) {
       const [owner, name] = repo.full_name.split("/");
       try {
         await this.client.starRepo(owner, name);
         // Simple rate limiting between operations
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 500));
       } catch (error) {
         console.error(`Failed to star ${repo.full_name}:`, error);
       }
@@ -570,42 +584,45 @@ export class StarService {
     outdated: number;
   }> {
     const { cutoffMonths = 24, dryRun = false } = options;
-    
+
     const stars = await this.getAllStars();
     const cutoffDate = new Date();
     cutoffDate.setMonth(cutoffDate.getMonth() - cutoffMonths);
-    
+
     let removed = 0;
     let archived = 0;
     let outdated = 0;
-    
+
     for (const repo of stars) {
       let shouldRemove = false;
       let reason = "";
-      
+
       // Check if archived
       if (repo.archived) {
         shouldRemove = true;
         reason = "archived";
         archived++;
-      } 
-      // Check if outdated
+      } // Check if outdated
       else if (new Date(repo.pushed_at) < cutoffDate) {
         shouldRemove = true;
         reason = `no activity since ${repo.pushed_at}`;
         outdated++;
       }
-      
+
       if (shouldRemove) {
         if (!dryRun) {
           const [owner, name] = repo.full_name.split("/");
           await this.client.unstarRepo(owner, name);
         }
         removed++;
-        console.log(`${dryRun ? "[DRY RUN] Would unstar" : "Unstarring"}: ${repo.full_name} (${reason})`);
+        console.log(
+          `${
+            dryRun ? "[DRY RUN] Would unstar" : "Unstarring"
+          }: ${repo.full_name} (${reason})`,
+        );
       }
     }
-    
+
     return {
       totalReviewed: stars.length,
       removed,
@@ -614,80 +631,86 @@ export class StarService {
     };
   }
 
-  async categorizeStars(categories: Category[]): Promise<Record<string, Repository[]>> {
+  async categorizeStars(
+    categories: Category[],
+  ): Promise<Record<string, Repository[]>> {
     const stars = await this.getAllStars();
     const result: Record<string, Repository[]> = {};
-    
+
     // Initialize empty arrays for each category
     for (const category of categories) {
       result[category.name] = [];
     }
-    
+
     // Categorize each repository
     for (const repo of stars) {
       for (const category of categories) {
         const pattern = new RegExp(category.pattern, "i");
-        
+
         if (
           (repo.name && pattern.test(repo.name)) ||
           (repo.description && pattern.test(repo.description)) ||
-          repo.topics.some(topic => pattern.test(topic))
+          repo.topics.some((topic) => pattern.test(topic))
         ) {
           result[category.name].push(repo);
         }
       }
     }
-    
+
     return result;
   }
 
   async generateReport(): Promise<StarReport> {
     const stars = await this.getAllStars();
-    
+
     // Count archived repositories
-    const archived = stars.filter(repo => repo.archived).length;
-    
+    const archived = stars.filter((repo) => repo.archived).length;
+
     // Language distribution
     const languageMap = new Map<string, number>();
     for (const repo of stars) {
       const language = repo.language || "Unknown";
       languageMap.set(language, (languageMap.get(language) || 0) + 1);
     }
-    
-    const languageDistribution: LanguageDistribution[] = Array.from(languageMap.entries())
+
+    const languageDistribution: LanguageDistribution[] = Array.from(
+      languageMap.entries(),
+    )
       .map(([language, count]) => ({
         language,
         count,
         percentage: (count / stars.length) * 100,
       }))
       .sort((a, b) => b.count - a.count);
-    
+
     // Activity analysis
     const now = new Date();
     const currentYear = now.getFullYear();
     const lastYear = currentYear - 1;
-    
-    const updatedThisYear = stars.filter(repo => 
-      new Date(repo.pushed_at).getFullYear() === currentYear
-    ).length;
-    
-    const updatedLastYear = stars.filter(repo => 
-      new Date(repo.pushed_at).getFullYear() === lastYear
-    ).length;
-    
+
+    const updatedThisYear =
+      stars.filter((repo) =>
+        new Date(repo.pushed_at).getFullYear() === currentYear
+      ).length;
+
+    const updatedLastYear =
+      stars.filter((repo) =>
+        new Date(repo.pushed_at).getFullYear() === lastYear
+      ).length;
+
     const older = stars.length - updatedThisYear - updatedLastYear;
-    
+
     const activityReport: ActivityReport = {
       updatedThisYear,
       updatedLastYear,
       older,
     };
-    
+
     // Most popular repositories
     const mostPopular = [...stars]
       .sort((a, b) => b.stargazers_count - a.stargazers_count)
       .slice(0, 10);
-    
+
     return {
       totalStars: stars.length,
       archivedCount: archived,
@@ -744,22 +767,22 @@ export async function main(args: string[]): Promise<void> {
   const parsedArgs = parse(args, {
     string: ["_"],
   });
-  
+
   const command = parsedArgs._.length > 0 ? String(parsedArgs._[0]) : "help";
-  
+
   if (command === "help" || command === "--help" || command === "-h") {
     showHelp();
     return;
   }
-  
+
   const commandHandler = COMMANDS[command as keyof typeof COMMANDS];
-  
+
   if (!commandHandler) {
     console.error(chalk.red(`Unknown command: ${command}`));
     showHelp();
     Deno.exit(1);
   }
-  
+
   try {
     await commandHandler.fn(parsedArgs._.slice(1), parsedArgs);
   } catch (error) {
@@ -770,22 +793,24 @@ export async function main(args: string[]): Promise<void> {
 
 function showHelp(): void {
   console.log(`
-${chalk.bold('GitHub Star Management')}
+${chalk.bold("GitHub Star Management")}
 
-${chalk.bold('USAGE')}
+${chalk.bold("USAGE")}
   star-management <command> [options]
 
-${chalk.bold('COMMANDS')}
-${Object.entries(COMMANDS).map(([name, { desc }]) => 
-  `  ${chalk.green(name.padEnd(15))}${desc}`
-).join('\n')}
+${chalk.bold("COMMANDS")}
+${
+    Object.entries(COMMANDS).map(([name, { desc }]) =>
+      `  ${chalk.green(name.padEnd(15))}${desc}`
+    ).join("\n")
+  }
 
-${chalk.bold('GLOBAL OPTIONS')}
+${chalk.bold("GLOBAL OPTIONS")}
   --help, -h        Show this help message
   --token <token>   GitHub API token (or use GITHUB_TOKEN env var)
   --dry-run         Run without making changes (for cleanup)
 
-${chalk.bold('EXAMPLES')}
+${chalk.bold("EXAMPLES")}
   star-management backup --output stars.json
   star-management cleanup --cutoff-months 12 --dry-run
   star-management categorize --output-dir star-lists
@@ -798,7 +823,8 @@ For command-specific help, run:
 
 ## Test Plan
 
-The test plan ensures the migration maintains functionality while improving reliability:
+The test plan ensures the migration maintains functionality while improving
+reliability:
 
 ### Test Categories
 
@@ -849,17 +875,25 @@ The test plan ensures the migration maintains functionality while improving reli
        { name: "typescript", pattern: "typescript|ts" },
        { name: "python", pattern: "python|py" },
      ];
-     
+
      // Mock repositories
      mockClient.addMockResponse("getAllStarredRepos", [
-       { name: "typescript-project", description: "A TS project", topics: ["typescript"] },
-       { name: "python-utils", description: "Python utilities", topics: ["python"] },
+       {
+         name: "typescript-project",
+         description: "A TS project",
+         topics: ["typescript"],
+       },
+       {
+         name: "python-utils",
+         description: "Python utilities",
+         topics: ["python"],
+       },
        { name: "other-repo", description: "Something else", topics: [] },
      ]);
-     
+
      // Act
      const result = await service.categorizeStars(categories);
-     
+
      // Assert
      assertEquals(result.typescript.length, 1);
      assertEquals(result.typescript[0].name, "typescript-project");
@@ -876,27 +910,31 @@ The test plan ensures the migration maintains functionality while improving reli
 
    // Only run in CI with proper credentials
    const runIntegration = Deno.env.get("RUN_INTEGRATION_TESTS") === "true";
-   
+
    Deno.test({
      name: "Cleanup should identify archived repositories",
      ignore: !runIntegration,
      async fn() {
        const token = Deno.env.get("GITHUB_TOKEN");
        if (!token) {
-         throw new Error("GITHUB_TOKEN environment variable is required for integration tests");
+         throw new Error(
+           "GITHUB_TOKEN environment variable is required for integration tests",
+         );
        }
-       
+
        const service = new StarService({ token, rateLimit: 5 });
-       
+
        // Run cleanup in dry-run mode
        const result = await service.cleanupStars({ dryRun: true });
-       
+
        // Just verify we get results, don't actually unstar anything
        assertExists(result.totalReviewed);
        assertExists(result.archived);
        assertExists(result.outdated);
-       
-       console.log(`Found ${result.archived} archived and ${result.outdated} outdated repositories`);
+
+       console.log(
+         `Found ${result.archived} archived and ${result.outdated} outdated repositories`,
+       );
      },
    });
    ```
@@ -916,7 +954,7 @@ The test plan ensures the migration maintains functionality while improving reli
    ```yaml
    name: Tests
    on: [push, pull_request]
-   
+
    jobs:
      test:
        runs-on: ubuntu-latest
@@ -937,15 +975,15 @@ The test plan ensures the migration maintains functionality while improving reli
 
 ## Risks and Mitigations
 
-| Risk | Impact | Likelihood | Mitigation |
-|------|--------|------------|------------|
-| GitHub API Rate Limiting | High | High | Implement token bucket rate limiter, caching, and conditional requests |
-| Token Security | High | Medium | Use environment variables or .env files, never hardcode tokens |
-| Cross-Platform Issues | Medium | Medium | Use Deno's standard library for filesystem operations, test on all platforms |
-| Migration Complexity | Medium | Medium | Phased approach with parallel systems until fully tested |
-| Breaking Changes | High | Low | Maintain CLI compatibility, thorough testing |
-| Performance Regression | Medium | Low | Benchmark comparison, optimize critical paths |
-| Dependency Management | Low | Low | Use JSR and explicit versioning in imports |
+| Risk                     | Impact | Likelihood | Mitigation                                                                   |
+| ------------------------ | ------ | ---------- | ---------------------------------------------------------------------------- |
+| GitHub API Rate Limiting | High   | High       | Implement token bucket rate limiter, caching, and conditional requests       |
+| Token Security           | High   | Medium     | Use environment variables or .env files, never hardcode tokens               |
+| Cross-Platform Issues    | Medium | Medium     | Use Deno's standard library for filesystem operations, test on all platforms |
+| Migration Complexity     | Medium | Medium     | Phased approach with parallel systems until fully tested                     |
+| Breaking Changes         | High   | Low        | Maintain CLI compatibility, thorough testing                                 |
+| Performance Regression   | Medium | Low        | Benchmark comparison, optimize critical paths                                |
+| Dependency Management    | Low    | Low        | Use JSR and explicit versioning in imports                                   |
 
 ### Detailed Risk Analysis
 
@@ -983,4 +1021,6 @@ For detailed implementation specifics, refer to these supporting documents:
 
 ---
 
-This migration guide provides a structured approach to convert the existing shell scripts to a robust Deno TypeScript implementation while maintaining functionality and adding new features enabled by the Deno runtime.
+This migration guide provides a structured approach to convert the existing
+shell scripts to a robust Deno TypeScript implementation while maintaining
+functionality and adding new features enabled by the Deno runtime.

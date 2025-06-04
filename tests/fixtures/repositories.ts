@@ -1,6 +1,6 @@
 /**
  * Mock repository data for tests
- * 
+ *
  * These fixtures simulate GitHub API responses for repositories
  */
 
@@ -14,7 +14,7 @@ export const mockRepos = [
       id: 101,
       avatar_url: "https://example.com/avatar1.png",
       url: "https://api.github.com/users/owner1",
-      html_url: "https://github.com/owner1"
+      html_url: "https://github.com/owner1",
     },
     description: "Test repository 1",
     html_url: "https://github.com/owner1/repo1",
@@ -32,9 +32,9 @@ export const mockRepos = [
     license: {
       key: "mit",
       name: "MIT License",
-      url: "https://api.github.com/licenses/mit"
+      url: "https://api.github.com/licenses/mit",
     },
-    topics: ["typescript", "deno", "api"]
+    topics: ["typescript", "deno", "api"],
   },
   {
     id: 2,
@@ -45,7 +45,7 @@ export const mockRepos = [
       id: 102,
       avatar_url: "https://example.com/avatar2.png",
       url: "https://api.github.com/users/owner2",
-      html_url: "https://github.com/owner2"
+      html_url: "https://github.com/owner2",
     },
     description: "Test repository 2",
     html_url: "https://github.com/owner2/repo2",
@@ -61,7 +61,7 @@ export const mockRepos = [
     archived: false,
     disabled: false,
     license: null,
-    topics: ["javascript", "web"]
+    topics: ["javascript", "web"],
   },
   {
     id: 3,
@@ -72,7 +72,7 @@ export const mockRepos = [
       id: 103,
       avatar_url: "https://example.com/avatar3.png",
       url: "https://api.github.com/users/owner3",
-      html_url: "https://github.com/owner3"
+      html_url: "https://github.com/owner3",
     },
     description: "Test repository 3",
     html_url: "https://github.com/owner3/repo3",
@@ -90,9 +90,9 @@ export const mockRepos = [
     license: {
       key: "apache-2.0",
       name: "Apache License 2.0",
-      url: "https://api.github.com/licenses/apache-2.0"
+      url: "https://api.github.com/licenses/apache-2.0",
     },
-    topics: ["python", "machine-learning"]
+    topics: ["python", "machine-learning"],
   },
   {
     id: 4,
@@ -103,7 +103,7 @@ export const mockRepos = [
       id: 104,
       avatar_url: "https://example.com/avatar4.png",
       url: "https://api.github.com/users/owner4",
-      html_url: "https://github.com/owner4"
+      html_url: "https://github.com/owner4",
     },
     description: "Test repository 4",
     html_url: "https://github.com/owner4/repo4",
@@ -119,7 +119,7 @@ export const mockRepos = [
     archived: false,
     disabled: false,
     license: null,
-    topics: ["golang", "cli"]
+    topics: ["golang", "cli"],
   },
   {
     id: 5,
@@ -130,7 +130,7 @@ export const mockRepos = [
       id: 105,
       avatar_url: "https://example.com/avatar5.png",
       url: "https://api.github.com/users/owner5",
-      html_url: "https://github.com/owner5"
+      html_url: "https://github.com/owner5",
     },
     description: "This repository is archived",
     html_url: "https://github.com/owner5/archived-repo",
@@ -148,10 +148,10 @@ export const mockRepos = [
     license: {
       key: "mit",
       name: "MIT License",
-      url: "https://api.github.com/licenses/mit"
+      url: "https://api.github.com/licenses/mit",
     },
-    topics: ["rust", "systems"]
-  }
+    topics: ["rust", "systems"],
+  },
 ];
 
 // Mock API responses for pagination testing
@@ -170,7 +170,7 @@ export const createPaginatedRepos = (totalRepos: number, perPage = 30) => {
           id: 500,
           avatar_url: "https://example.com/avatar.png",
           url: "https://api.github.com/users/owner",
-          html_url: "https://github.com/owner"
+          html_url: "https://github.com/owner",
         },
         description: `Paginated test repository ${repoIndex}`,
         html_url: `https://github.com/owner/paginated-repo-${repoIndex}`,
@@ -186,33 +186,36 @@ export const createPaginatedRepos = (totalRepos: number, perPage = 30) => {
         archived: false,
         disabled: false,
         license: null,
-        topics: ["test", "pagination"]
+        topics: ["test", "pagination"],
       });
     }
-    
+
     // Add pagination links in headers
     const headers: Record<string, string> = {};
-    
+
     if (i > 0) {
       const prevPage = i;
-      headers.link = `<https://api.github.com/user/starred?page=${prevPage}&per_page=${perPage}>; rel="prev"`;
+      headers.link =
+        `<https://api.github.com/user/starred?page=${prevPage}&per_page=${perPage}>; rel="prev"`;
     }
-    
+
     if (i < Math.ceil(totalRepos / perPage) - 1) {
       const nextPage = i + 2;
       if (headers.link) {
-        headers.link += `, <https://api.github.com/user/starred?page=${nextPage}&per_page=${perPage}>; rel="next"`;
+        headers.link +=
+          `, <https://api.github.com/user/starred?page=${nextPage}&per_page=${perPage}>; rel="next"`;
       } else {
-        headers.link = `<https://api.github.com/user/starred?page=${nextPage}&per_page=${perPage}>; rel="next"`;
+        headers.link =
+          `<https://api.github.com/user/starred?page=${nextPage}&per_page=${perPage}>; rel="next"`;
       }
     }
-    
+
     pages.push({
       body: pageRepos,
-      headers
+      headers,
     });
   }
-  
+
   return pages;
 };
 
@@ -222,31 +225,32 @@ export const errorResponses = {
     status: 404,
     body: {
       message: "Not Found",
-      documentation_url: "https://docs.github.com/rest"
-    }
+      documentation_url: "https://docs.github.com/rest",
+    },
   },
-  
+
   rateLimited: {
     status: 403,
     body: {
       message: "API rate limit exceeded",
-      documentation_url: "https://docs.github.com/rest/overview/resources-in-the-rest-api#rate-limiting"
+      documentation_url:
+        "https://docs.github.com/rest/overview/resources-in-the-rest-api#rate-limiting",
     },
     headers: {
       "x-ratelimit-limit": "60",
       "x-ratelimit-remaining": "0",
-      "x-ratelimit-reset": (Math.floor(Date.now() / 1000) + 60).toString() // Reset in 60 seconds
-    }
+      "x-ratelimit-reset": (Math.floor(Date.now() / 1000) + 60).toString(), // Reset in 60 seconds
+    },
   },
-  
+
   unauthorized: {
     status: 401,
     body: {
       message: "Bad credentials",
-      documentation_url: "https://docs.github.com/rest"
-    }
+      documentation_url: "https://docs.github.com/rest",
+    },
   },
-  
+
   validationFailed: {
     status: 422,
     body: {
@@ -255,10 +259,10 @@ export const errorResponses = {
         {
           resource: "Repository",
           field: "name",
-          code: "missing"
-        }
+          code: "missing",
+        },
       ],
-      documentation_url: "https://docs.github.com/rest"
-    }
-  }
+      documentation_url: "https://docs.github.com/rest",
+    },
+  },
 };

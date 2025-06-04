@@ -2,7 +2,9 @@
 
 ## Overview
 
-This guide will help you set up a GitHub Action that automatically cleans up your starred repositories quarterly, removing stars from archived or outdated repositories.
+This guide will help you set up a GitHub Action that automatically cleans up
+your starred repositories quarterly, removing stars from archived or outdated
+repositories.
 
 ## Prerequisites
 
@@ -20,11 +22,13 @@ cd star-manager
 ## Step 2: Set Up GitHub Secrets
 
 1. Generate a Personal Access Token:
-   - Go to GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)
+   - Go to GitHub Settings → Developer settings → Personal access tokens →
+     Tokens (classic)
    - Generate new token with scopes: `repo`, `user`, `read:user`
    - Copy the token
 
 2. Add the token to your repository:
+
 ```bash
 # Add the token as a secret
 gh secret set STAR_MANAGEMENT_TOKEN
@@ -162,6 +166,7 @@ fi
 ```
 
 Make it executable:
+
 ```bash
 chmod +x scripts/cleanup-stars.sh
 ```
@@ -176,43 +181,43 @@ name: Quarterly Star Cleanup
 on:
   # Run quarterly on the 1st day of Jan, Apr, Jul, Oct at 9 AM UTC
   schedule:
-    - cron: '0 9 1 1,4,7,10 *'
-  
+    - cron: "0 9 1 1,4,7,10 *"
+
   # Allow manual trigger
   workflow_dispatch:
     inputs:
       dry_run:
-        description: 'Dry run (no actual changes)'
+        description: "Dry run (no actual changes)"
         required: false
-        default: 'false'
+        default: "false"
         type: choice
         options:
-          - 'true'
-          - 'false'
+          - "true"
+          - "false"
       cutoff_months:
-        description: 'Months of inactivity before removal'
+        description: "Months of inactivity before removal"
         required: false
-        default: '24'
+        default: "24"
         type: string
 
 jobs:
   cleanup-stars:
     runs-on: ubuntu-latest
     name: Clean up old GitHub stars
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
+
       - name: Set up environment
         run: |
           echo "GITHUB_TOKEN=${{ secrets.STAR_MANAGEMENT_TOKEN }}" >> $GITHUB_ENV
           echo "DRY_RUN=${{ github.event.inputs.dry_run || 'false' }}" >> $GITHUB_ENV
           echo "CUTOFF_MONTHS=${{ github.event.inputs.cutoff_months || '24' }}" >> $GITHUB_ENV
-      
+
       - name: Run star cleanup
         run: ./scripts/cleanup-stars.sh
-      
+
       - name: Create issue if stars were removed
         if: success() && env.DRY_RUN == 'false'
         uses: actions/github-script@v7
@@ -232,7 +237,8 @@ jobs:
 
 ## Step 5: Create a Manual Trigger Workflow
 
-Create `.github/workflows/star-management.yml` for additional star management tasks:
+Create `.github/workflows/star-management.yml` for additional star management
+tasks:
 
 ```yaml
 name: Star Management Tools
@@ -241,40 +247,40 @@ on:
   workflow_dispatch:
     inputs:
       action:
-        description: 'Action to perform'
+        description: "Action to perform"
         required: true
         type: choice
         options:
-          - 'cleanup'
-          - 'report'
-          - 'backup'
-          - 'analyze'
+          - "cleanup"
+          - "report"
+          - "backup"
+          - "analyze"
       dry_run:
-        description: 'Dry run mode'
+        description: "Dry run mode"
         required: false
-        default: 'true'
+        default: "true"
         type: choice
         options:
-          - 'true'
-          - 'false'
+          - "true"
+          - "false"
 
 jobs:
   star-management:
     runs-on: ubuntu-latest
     name: Star Management - ${{ github.event.inputs.action }}
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-      
+          node-version: "20"
+
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
-      
+
       - name: Run selected action
         env:
           GITHUB_TOKEN: ${{ secrets.STAR_MANAGEMENT_TOKEN }}
@@ -471,7 +477,7 @@ jobs:
   notify:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    
+
     steps:
       - name: Send notification
         uses: actions/github-script@v7
@@ -485,17 +491,17 @@ jobs:
               workflow_id: 'star-cleanup.yml',
               per_page: 1
             });
-            
+
             if (runs.workflow_runs.length > 0) {
               const run = runs.workflow_runs[0];
-              
+
               // Get the summary from the run
               const { data: jobs } = await github.rest.actions.listJobsForWorkflowRun({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 run_id: run.id
               });
-              
+
               // You can also send a notification to Slack, Discord, etc.
               console.log(`Star cleanup completed at ${run.created_at}`);
             }
@@ -544,6 +550,7 @@ git push -u origin main
 ## Usage
 
 ### Manual Trigger
+
 1. Go to your repository on GitHub
 2. Click "Actions" tab
 3. Select "Quarterly Star Cleanup" or "Star Management Tools"
@@ -552,13 +559,15 @@ git push -u origin main
 6. Click "Run workflow"
 
 ### Monitor Automated Runs
+
 - Check the Actions tab for scheduled runs
 - Review issues created after each cleanup
 - Check workflow summaries for detailed reports
 
 ### Customization Options
 
-1. **Change Schedule**: Edit the cron expression in `.github/workflows/star-cleanup.yml`
+1. **Change Schedule**: Edit the cron expression in
+   `.github/workflows/star-cleanup.yml`
    - Monthly: `0 9 1 * *`
    - Bi-monthly: `0 9 1 */2 *`
    - Weekly: `0 9 * * 1`
@@ -569,7 +578,7 @@ git push -u origin main
    ```bash
    # Add to cleanup-stars.sh
    EXCLUDE_REPOS=("owner/repo1" "owner/repo2")
-   
+
    # In the main loop
    if [[ " ${EXCLUDE_REPOS[@]} " =~ " ${full_name} " ]]; then
        echo "Skipping excluded repo: $full_name"
@@ -606,6 +615,7 @@ git push -u origin main
 ### Debug Mode
 
 Add to your workflow for debugging:
+
 ```yaml
 - name: Debug Information
   run: |
@@ -619,10 +629,12 @@ Add to your workflow for debugging:
 ## Conclusion
 
 You now have a fully automated system for managing your GitHub stars with:
+
 - Quarterly automated cleanup
 - Manual management tools
 - Comprehensive reporting
 - Backup and restore capabilities
 - Customizable rules and schedules
 
-The system will help maintain a curated, relevant list of starred repositories that truly reflects your interests and professional focus.
+The system will help maintain a curated, relevant list of starred repositories
+that truly reflects your interests and professional focus.

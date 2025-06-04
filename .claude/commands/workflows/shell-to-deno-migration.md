@@ -1,6 +1,7 @@
 # Shell to Deno Migration
 
-This workflow guides you through converting shell scripts to Deno TypeScript implementations for the GitHub Stars Management project.
+This workflow guides you through converting shell scripts to Deno TypeScript
+implementations for the GitHub Stars Management project.
 
 ## Workflow Steps
 
@@ -42,6 +43,7 @@ This workflow guides you through converting shell scripts to Deno TypeScript imp
 ## Example: Converting Star Cleanup Script
 
 ### Original Shell Script
+
 ```bash
 #!/bin/bash
 # cleanup-stars.sh - Remove stars for archived or outdated repos

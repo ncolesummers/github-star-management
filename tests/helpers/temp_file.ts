@@ -5,7 +5,7 @@
 
 export async function withTempFile(
   fn: (path: string) => Promise<void>,
-  options: { suffix?: string; prefix?: string; dir?: string } = {}
+  options: { suffix?: string; prefix?: string; dir?: string } = {},
 ): Promise<void> {
   const filePath = await Deno.makeTempFile(options);
   try {
@@ -21,7 +21,7 @@ export async function withTempFile(
 
 export async function withTempDir(
   fn: (path: string) => Promise<void>,
-  options: { suffix?: string; prefix?: string; dir?: string } = {}
+  options: { suffix?: string; prefix?: string; dir?: string } = {},
 ): Promise<void> {
   const dirPath = await Deno.makeTempDir(options);
   try {

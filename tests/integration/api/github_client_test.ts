@@ -1,11 +1,14 @@
 /**
  * Integration tests for GitHub API client
- * 
+ *
  * These tests interact with the real GitHub API and are only run
  * when explicitly enabled with the RUN_INTEGRATION_TESTS environment variable.
  */
 
-import { assertEquals, assertExists } from "https://deno.land/std/assert/mod.ts";
+import {
+  assertEquals,
+  assertExists,
+} from "https://deno.land/std/assert/mod.ts";
 import { GitHubClient } from "../../../src/core/api/mod.ts";
 
 // Only run integration tests when explicitly enabled
@@ -18,18 +21,20 @@ Deno.test({
     // Arrange
     const token = Deno.env.get("GITHUB_TOKEN");
     if (!token) {
-      throw new Error("GITHUB_TOKEN environment variable is required for integration tests");
+      throw new Error(
+        "GITHUB_TOKEN environment variable is required for integration tests",
+      );
     }
-    
+
     const client = new GitHubClient({ token });
-    
+
     // Act
     const repos = await client.getStarredRepos({ perPage: 3 });
-    
+
     // Assert
     assertExists(repos);
     assertEquals(Array.isArray(repos), true);
-    
+
     // We can't know exactly what repos will be returned, but we can
     // verify the structure of the results
     if (repos.length > 0) {
@@ -50,19 +55,21 @@ Deno.test({
     // This test modifies state, so it should be used carefully
     const token = Deno.env.get("GITHUB_TOKEN");
     if (!token) {
-      throw new Error("GITHUB_TOKEN environment variable is required for integration tests");
+      throw new Error(
+        "GITHUB_TOKEN environment variable is required for integration tests",
+      );
     }
-    
+
     const client = new GitHubClient({ token });
-    
+
     // Use a well-known repo for testing
     const owner = "denoland";
     const repo = "deno";
-    
+
     try {
       // Star the repo
       await client.starRepo(owner, repo);
-      
+
       // Verify it's starred
       const isStarred = await client.isRepoStarred(owner, repo);
       assertEquals(isStarred, true);
@@ -83,15 +90,17 @@ Deno.test({
   async fn() {
     const token = Deno.env.get("GITHUB_TOKEN");
     if (!token) {
-      throw new Error("GITHUB_TOKEN environment variable is required for integration tests");
+      throw new Error(
+        "GITHUB_TOKEN environment variable is required for integration tests",
+      );
     }
-    
+
     // Create client with low rate limit to test rate limiter
-    const client = new GitHubClient({ 
+    const client = new GitHubClient({
       token,
       rateLimit: 3, // Very low limit for testing
     });
-    
+
     // Make multiple requests to trigger rate limiter
     const start = performance.now();
     await Promise.all([
@@ -102,7 +111,7 @@ Deno.test({
       client.getStarredRepos({ perPage: 1 }),
     ]);
     const duration = performance.now() - start;
-    
+
     // Should take longer than immediate execution due to rate limiting
     console.log(`5 requests took ${duration}ms with rate limiting`);
     // Avoiding a hard assertion here since timing can vary,

@@ -7,7 +7,8 @@ The GitHub Stars Management testing approach follows these principles:
 1. **Comprehensive Coverage**: Test all core functionality
 2. **Realistic Mocking**: Simulate GitHub API behavior accurately
 3. **Isolation**: Unit tests should not depend on external services
-4. **Integration Verification**: Verify real-world interactions with sandboxed tests
+4. **Integration Verification**: Verify real-world interactions with sandboxed
+   tests
 5. **Performance Testing**: Ensure efficient API usage
 
 ## Test Structure
@@ -35,13 +36,13 @@ tests/
 // tests/unit/api/github_client_test.ts
 import { assertEquals, assertRejects, assertSpyCalls } from "@std/assert";
 import { spy } from "jsr:@std/mock/spy";
-import { GitHubClient, GitHubAPIError } from "../../../src/core/api/github.ts";
-import { MockFetch, createResponse } from "../../helpers/mock_fetch.ts";
+import { GitHubAPIError, GitHubClient } from "../../../src/core/api/github.ts";
+import { createResponse, MockFetch } from "../../helpers/mock_fetch.ts";
 
 Deno.test("GitHubClient.getStarredRepos fetches starred repositories", async () => {
   // Arrange
   const mockFetch = new MockFetch();
-  
+
   // Mock the response for starred repos
   mockFetch.mock("https://api.github.com/user/starred", {
     status: 200,
@@ -55,41 +56,41 @@ Deno.test("GitHubClient.getStarredRepos fetches starred repositories", async () 
           id: 123,
           avatar_url: "https://example.com/avatar.png",
           url: "https://api.github.com/users/owner",
-          html_url: "https://github.com/owner"
+          html_url: "https://github.com/owner",
         },
         description: "Test repository",
         stargazers_count: 100,
         archived: false,
-        topics: ["test", "demo"]
-      }
-    ]
+        topics: ["test", "demo"],
+      },
+    ],
   });
-  
+
   // Inject the mock fetch
   const originalFetch = globalThis.fetch;
   globalThis.fetch = mockFetch.fetch;
-  
+
   try {
     // Create client with test token
     const client = new GitHubClient({
       token: "test-token",
     });
-    
+
     // Act
     const repos = await client.getStarredRepos();
-    
+
     // Assert
     assertEquals(repos.length, 1);
     assertEquals(repos[0].name, "test-repo");
     assertEquals(repos[0].full_name, "owner/test-repo");
     assertEquals(repos[0].stargazers_count, 100);
-    
+
     // Verify headers were set correctly
     const calls = mockFetch.calls;
     assertEquals(calls.length, 1);
     assertEquals(
       calls[0].request.headers.get("Authorization"),
-      "token test-token"
+      "token test-token",
     );
   } finally {
     // Restore original fetch
@@ -100,32 +101,32 @@ Deno.test("GitHubClient.getStarredRepos fetches starred repositories", async () 
 Deno.test("GitHubClient.starRepo stars a repository", async () => {
   // Arrange
   const mockFetch = new MockFetch();
-  
+
   // Mock the response for starring a repo (204 No Content)
   mockFetch.mock("https://api.github.com/user/starred/owner/repo", {
-    status: 204
+    status: 204,
   }, { method: "PUT" });
-  
+
   // Inject the mock fetch
   const originalFetch = globalThis.fetch;
   globalThis.fetch = mockFetch.fetch;
-  
+
   try {
     // Create client
     const client = new GitHubClient({
       token: "test-token",
     });
-    
+
     // Act
     await client.starRepo("owner", "repo");
-    
+
     // Assert - should not throw and should make the correct request
     const calls = mockFetch.calls;
     assertEquals(calls.length, 1);
     assertEquals(calls[0].request.method, "PUT");
     assertEquals(
       calls[0].url,
-      "https://api.github.com/user/starred/owner/repo"
+      "https://api.github.com/user/starred/owner/repo",
     );
   } finally {
     // Restore original fetch
@@ -136,33 +137,33 @@ Deno.test("GitHubClient.starRepo stars a repository", async () => {
 Deno.test("GitHubClient handles API errors", async () => {
   // Arrange
   const mockFetch = new MockFetch();
-  
+
   // Mock a 404 response
   mockFetch.mock("https://api.github.com/user/starred/owner/missing", {
     status: 404,
     body: {
       message: "Not Found",
-      documentation_url: "https://docs.github.com/..."
-    }
+      documentation_url: "https://docs.github.com/...",
+    },
   });
-  
+
   // Inject the mock fetch
   const originalFetch = globalThis.fetch;
   globalThis.fetch = mockFetch.fetch;
-  
+
   try {
     // Create client
     const client = new GitHubClient({
       token: "test-token",
     });
-    
+
     // Act & Assert
     await assertRejects(
       async () => {
         await client.getStarredRepos({ owner: "owner", repo: "missing" });
       },
       GitHubAPIError,
-      "GitHub API error: 404 Not Found"
+      "GitHub API error: 404 Not Found",
     );
   } finally {
     // Restore original fetch
@@ -173,7 +174,7 @@ Deno.test("GitHubClient handles API errors", async () => {
 Deno.test("GitHubClient handles rate limiting", async () => {
   // Arrange
   const mockFetch = new MockFetch();
-  
+
   // Mock a rate limit response followed by a success
   mockFetch.mockSequence("https://api.github.com/user/starred", [
     {
@@ -182,39 +183,39 @@ Deno.test("GitHubClient handles rate limiting", async () => {
       headers: {
         "x-ratelimit-limit": "60",
         "x-ratelimit-remaining": "0",
-        "x-ratelimit-reset": (Math.floor(Date.now() / 1000) + 1).toString()
-      }
+        "x-ratelimit-reset": (Math.floor(Date.now() / 1000) + 1).toString(),
+      },
     },
     {
       status: 200,
-      body: [{ id: 1, name: "test-repo" }]
-    }
+      body: [{ id: 1, name: "test-repo" }],
+    },
   ]);
-  
+
   // Create a timer spy to verify wait behavior
   const originalSetTimeout = globalThis.setTimeout;
   const setTimeoutSpy = spy(originalSetTimeout);
   globalThis.setTimeout = setTimeoutSpy;
-  
+
   // Inject the mock fetch
   const originalFetch = globalThis.fetch;
   globalThis.fetch = mockFetch.fetch;
-  
+
   try {
     // Create client with short retries for testing
     const client = new GitHubClient({
       token: "test-token",
       rateLimit: 10,
-      retryDelay: 100
+      retryDelay: 100,
     });
-    
+
     // Act
     const result = await client.getStarredRepos();
-    
+
     // Assert
     assertEquals(result.length, 1);
     assertEquals(result[0].name, "test-repo");
-    
+
     // Verify setTimeout was called at least once for the rate limit wait
     assertSpyCalls(setTimeoutSpy, { atLeast: 1 });
   } finally {
@@ -377,18 +378,20 @@ Deno.test({
     // Arrange
     const token = Deno.env.get("GITHUB_TOKEN");
     if (!token) {
-      throw new Error("GITHUB_TOKEN environment variable is required for integration tests");
+      throw new Error(
+        "GITHUB_TOKEN environment variable is required for integration tests",
+      );
     }
-    
+
     const client = new GitHubClient({ token });
-    
+
     // Act
     const repos = await client.getStarredRepos({ perPage: 3 });
-    
+
     // Assert
     assertExists(repos);
     assertEquals(Array.isArray(repos), true);
-    
+
     // We can't know exactly what repos will be returned, but we can
     // verify the structure of the results
     if (repos.length > 0) {
@@ -409,19 +412,21 @@ Deno.test({
     // This test modifies state, so it should be used carefully
     const token = Deno.env.get("GITHUB_TOKEN");
     if (!token) {
-      throw new Error("GITHUB_TOKEN environment variable is required for integration tests");
+      throw new Error(
+        "GITHUB_TOKEN environment variable is required for integration tests",
+      );
     }
-    
+
     const client = new GitHubClient({ token });
-    
+
     // Use a well-known repo for testing
     const owner = "denoland";
     const repo = "deno";
-    
+
     try {
       // Star the repo
       await client.starRepo(owner, repo);
-      
+
       // Verify it's starred
       const isStarred = await client.isRepoStarred(owner, repo);
       assertEquals(isStarred, true);
@@ -442,15 +447,17 @@ Deno.test({
   async fn() {
     const token = Deno.env.get("GITHUB_TOKEN");
     if (!token) {
-      throw new Error("GITHUB_TOKEN environment variable is required for integration tests");
+      throw new Error(
+        "GITHUB_TOKEN environment variable is required for integration tests",
+      );
     }
-    
+
     // Create client with low rate limit to test rate limiter
-    const client = new GitHubClient({ 
+    const client = new GitHubClient({
       token,
       rateLimit: 3, // Very low limit for testing
     });
-    
+
     // Make multiple requests to trigger rate limiter
     const start = Date.now();
     await Promise.all([
@@ -461,7 +468,7 @@ Deno.test({
       client.getStarredRepos({ perPage: 1 }),
     ]);
     const duration = Date.now() - start;
-    
+
     // Should take longer than immediate execution due to rate limiting
     console.log(`5 requests took ${duration}ms with rate limiting`);
     assert(duration > 500, "Rate limiting should cause delays");
@@ -482,7 +489,7 @@ import { clean } from "../../../src/cli/commands/cleanup.ts";
 function createTestContext(args: string[] = []) {
   const stdout = new StringWriter();
   const stderr = new StringWriter();
-  
+
   return {
     args,
     flags: {},
@@ -505,26 +512,26 @@ Deno.test({
   async fn() {
     // Create temporary file path
     const tempFile = await Deno.makeTempFile({ suffix: ".json" });
-    
+
     try {
       // Arrange
       const ctx = createTestContext(["--output", tempFile, "--limit", "3"]);
-      
+
       // Act
       const exitCode = await backup(ctx);
-      
+
       // Assert
       assertEquals(exitCode, 0);
       assertEquals(ctx.getStderr(), ""); // No errors
-      
+
       // Verify stdout contains success message
       const stdout = ctx.getStdout();
       assert(stdout.includes("Backup completed"));
-      
+
       // Verify file exists and contains valid JSON
       const fileContent = await Deno.readTextFile(tempFile);
       const backupData = JSON.parse(fileContent);
-      
+
       assert(Array.isArray(backupData));
       if (backupData.length > 0) {
         assertExists(backupData[0].full_name);
@@ -546,14 +553,14 @@ Deno.test({
   async fn() {
     // Arrange
     const ctx = createTestContext(["--dry-run", "--cutoff-months", "36"]);
-    
+
     // Act
     const exitCode = await clean(ctx);
-    
+
     // Assert
     assertEquals(exitCode, 0);
     assertEquals(ctx.getStderr(), ""); // No errors
-    
+
     // Verify stdout contains dry run message
     const stdout = ctx.getStdout();
     assert(stdout.includes("DRY RUN"));
@@ -574,7 +581,14 @@ export interface MockResponse {
   headers?: Record<string, string>;
 }
 
-type RequestMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "HEAD" | "OPTIONS";
+type RequestMethod =
+  | "GET"
+  | "POST"
+  | "PUT"
+  | "DELETE"
+  | "PATCH"
+  | "HEAD"
+  | "OPTIONS";
 
 interface MockRequestKey {
   url: string;
@@ -593,60 +607,60 @@ function keyFromRequest(url: string, method?: RequestMethod): string {
 export class MockFetch {
   private mocks = new Map<string, MockResponse | MockResponse[]>();
   private _calls: MockCall[] = [];
-  
+
   constructor() {
     this.fetch = this.fetch.bind(this);
   }
-  
+
   mock(
     url: string,
     response: MockResponse,
-    options: { method?: RequestMethod } = {}
+    options: { method?: RequestMethod } = {},
   ): void {
     const key = keyFromRequest(url, options.method);
     this.mocks.set(key, response);
   }
-  
+
   mockSequence(
     url: string,
     responses: MockResponse[],
-    options: { method?: RequestMethod } = {}
+    options: { method?: RequestMethod } = {},
   ): void {
     const key = keyFromRequest(url, options.method);
     this.mocks.set(key, responses);
   }
-  
+
   async fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
     const request = new Request(input, init);
     const url = request.url;
     const method = request.method as RequestMethod;
-    
+
     // Record this call
     this._calls.push({ url, request });
-    
+
     // Look for a matching mock
     const key = keyFromRequest(url, method);
     let mockResponse = this.mocks.get(key);
-    
+
     // If no exact match, try just the URL
     if (!mockResponse) {
       const keyWithoutMethod = keyFromRequest(url);
       mockResponse = this.mocks.get(keyWithoutMethod);
     }
-    
+
     if (!mockResponse) {
       throw new Error(`No mock response for ${method} ${url}`);
     }
-    
+
     // Handle sequence of responses
     let response: MockResponse;
     if (Array.isArray(mockResponse)) {
       if (mockResponse.length === 0) {
         throw new Error(`Mock response sequence for ${method} ${url} is empty`);
       }
-      
+
       response = mockResponse[0];
-      
+
       // Remove the first item if there are more in the sequence
       if (mockResponse.length > 1) {
         this.mocks.set(key, mockResponse.slice(1));
@@ -656,15 +670,15 @@ export class MockFetch {
     } else {
       response = mockResponse;
     }
-    
+
     // Create response object
     return createResponse(response);
   }
-  
+
   get calls(): MockCall[] {
     return [...this._calls];
   }
-  
+
   reset(): void {
     this.mocks.clear();
     this._calls = [];
@@ -673,20 +687,20 @@ export class MockFetch {
 
 export function createResponse(mock: MockResponse): Response {
   const { status, body, headers = {} } = mock;
-  
+
   const responseInit: ResponseInit = {
     status,
     headers,
   };
-  
+
   if (body === undefined) {
     return new Response(null, responseInit);
   }
-  
+
   if (typeof body === "string") {
     return new Response(body, responseInit);
   }
-  
+
   // JSON body
   return new Response(
     JSON.stringify(body),
@@ -696,7 +710,7 @@ export function createResponse(mock: MockResponse): Response {
         "Content-Type": "application/json",
         ...headers,
       },
-    }
+    },
   );
 }
 ```
@@ -710,12 +724,14 @@ import type { Repository, User } from "../../src/core/models/mod.ts";
 export class MockGitHubClient {
   private responses: Map<string, any> = new Map();
   private calls: Map<string, any[][]> = new Map();
-  
+
   constructor() {
     // Auto-bind all methods to track calls
-    for (const key of Object.getOwnPropertyNames(
-      MockGitHubClient.prototype
-    )) {
+    for (
+      const key of Object.getOwnPropertyNames(
+        MockGitHubClient.prototype,
+      )
+    ) {
       if (key !== "constructor" && typeof (this as any)[key] === "function") {
         const method = (this as any)[key];
         (this as any)[key] = (...args: any[]) => {
@@ -725,54 +741,54 @@ export class MockGitHubClient {
       }
     }
   }
-  
+
   private recordCall(method: string, args: any[]): void {
     const calls = this.calls.get(method) || [];
     calls.push(args);
     this.calls.set(method, calls);
   }
-  
+
   addMockResponse(method: string, response: any): void {
     this.responses.set(method, response);
   }
-  
+
   getCallCount(method: string): number {
     return this.calls.get(method)?.length || 0;
   }
-  
+
   getCallArgs(method: string, index = 0): any[] | undefined {
     return this.calls.get(method)?.[index];
   }
-  
+
   // Mock API methods
   async getStarredRepos(): Promise<Repository[]> {
     return this.responses.get("getStarredRepos") || [];
   }
-  
+
   async getAllStarredRepos(): Promise<Repository[]> {
     return this.responses.get("getAllStarredRepos") || [];
   }
-  
+
   async starRepo(owner: string, repo: string): Promise<void> {
     // Implementation not needed, just recording the call
   }
-  
+
   async unstarRepo(owner: string, repo: string): Promise<void> {
     // Implementation not needed, just recording the call
   }
-  
+
   async isRepoStarred(owner: string, repo: string): Promise<boolean> {
     return this.responses.get("isRepoStarred") || false;
   }
-  
+
   async getRepo(owner: string, repo: string): Promise<Repository | null> {
     return this.responses.get("getRepo") || null;
   }
-  
+
   async getCurrentUser(): Promise<User | null> {
     return this.responses.get("getCurrentUser") || null;
   }
-  
+
   reset(): void {
     this.responses.clear();
     this.calls.clear();
@@ -794,7 +810,7 @@ export const mockRepos = [
       id: 101,
       avatar_url: "https://example.com/avatar1.png",
       url: "https://api.github.com/users/owner1",
-      html_url: "https://github.com/owner1"
+      html_url: "https://github.com/owner1",
     },
     description: "Test repository 1",
     html_url: "https://github.com/owner1/repo1",
@@ -812,9 +828,9 @@ export const mockRepos = [
     license: {
       key: "mit",
       name: "MIT License",
-      url: "https://api.github.com/licenses/mit"
+      url: "https://api.github.com/licenses/mit",
     },
-    topics: ["typescript", "deno", "api"]
+    topics: ["typescript", "deno", "api"],
   },
   {
     id: 2,
@@ -825,7 +841,7 @@ export const mockRepos = [
       id: 102,
       avatar_url: "https://example.com/avatar2.png",
       url: "https://api.github.com/users/owner2",
-      html_url: "https://github.com/owner2"
+      html_url: "https://github.com/owner2",
     },
     description: "Test repository 2",
     html_url: "https://github.com/owner2/repo2",
@@ -841,7 +857,7 @@ export const mockRepos = [
     archived: false,
     disabled: false,
     license: null,
-    topics: ["javascript", "web"]
+    topics: ["javascript", "web"],
   },
   {
     id: 3,
@@ -852,7 +868,7 @@ export const mockRepos = [
       id: 103,
       avatar_url: "https://example.com/avatar3.png",
       url: "https://api.github.com/users/owner3",
-      html_url: "https://github.com/owner3"
+      html_url: "https://github.com/owner3",
     },
     description: "Test repository 3",
     html_url: "https://github.com/owner3/repo3",
@@ -870,9 +886,9 @@ export const mockRepos = [
     license: {
       key: "apache-2.0",
       name: "Apache License 2.0",
-      url: "https://api.github.com/licenses/apache-2.0"
+      url: "https://api.github.com/licenses/apache-2.0",
     },
-    topics: ["python", "machine-learning"]
+    topics: ["python", "machine-learning"],
   },
   {
     id: 4,
@@ -883,7 +899,7 @@ export const mockRepos = [
       id: 104,
       avatar_url: "https://example.com/avatar4.png",
       url: "https://api.github.com/users/owner4",
-      html_url: "https://github.com/owner4"
+      html_url: "https://github.com/owner4",
     },
     description: "Test repository 4",
     html_url: "https://github.com/owner4/repo4",
@@ -899,8 +915,8 @@ export const mockRepos = [
     archived: false,
     disabled: false,
     license: null,
-    topics: ["golang", "cli"]
-  }
+    topics: ["golang", "cli"],
+  },
 ];
 ```
 
@@ -910,19 +926,19 @@ export const mockRepos = [
 // tests/helpers/string_writer.ts
 export class StringWriter implements Deno.Writer {
   private chunks: Uint8Array[] = [];
-  
+
   async write(p: Uint8Array): Promise<number> {
     const copy = new Uint8Array(p.length);
     copy.set(p);
     this.chunks.push(copy);
     return p.length;
   }
-  
+
   toString(): string {
     const decoder = new TextDecoder();
-    return this.chunks.map(chunk => decoder.decode(chunk)).join("");
+    return this.chunks.map((chunk) => decoder.decode(chunk)).join("");
   }
-  
+
   clear(): void {
     this.chunks = [];
   }
@@ -931,7 +947,7 @@ export class StringWriter implements Deno.Writer {
 // tests/helpers/temp_file.ts
 export async function withTempFile(
   fn: (path: string) => Promise<void>,
-  options: { suffix?: string; prefix?: string; dir?: string } = {}
+  options: { suffix?: string; prefix?: string; dir?: string } = {},
 ): Promise<void> {
   const filePath = await Deno.makeTempFile(options);
   try {
@@ -947,7 +963,7 @@ export async function withTempFile(
 
 export async function withTempDir(
   fn: (path: string) => Promise<void>,
-  options: { suffix?: string; prefix?: string; dir?: string } = {}
+  options: { suffix?: string; prefix?: string; dir?: string } = {},
 ): Promise<void> {
   const dirPath = await Deno.makeTempDir(options);
   try {
@@ -977,34 +993,36 @@ Deno.test({
   async fn() {
     const token = Deno.env.get("GITHUB_TOKEN");
     if (!token) {
-      throw new Error("GITHUB_TOKEN environment variable is required for performance tests");
+      throw new Error(
+        "GITHUB_TOKEN environment variable is required for performance tests",
+      );
     }
-    
+
     // Standard client with default settings
     const standardClient = new GitHubClient({ token });
-    
+
     // Start standard sequential test
     console.log("Testing sequential requests...");
     const seqStart = performance.now();
-    
+
     // Make 5 sequential requests
     for (let i = 0; i < 5; i++) {
       await standardClient.getStarredRepos({ page: i + 1, perPage: 10 });
     }
-    
+
     const seqDuration = performance.now() - seqStart;
     console.log(`Sequential requests took: ${seqDuration.toFixed(2)}ms`);
-    
+
     // Client with higher rate limit for parallel testing
-    const parallelClient = new GitHubClient({ 
+    const parallelClient = new GitHubClient({
       token,
       rateLimit: 10, // Higher rate limit
     });
-    
+
     // Test parallel requests
     console.log("Testing parallel requests...");
     const parStart = performance.now();
-    
+
     // Make 5 parallel requests
     await Promise.all([
       parallelClient.getStarredRepos({ page: 1, perPage: 10 }),
@@ -1013,10 +1031,10 @@ Deno.test({
       parallelClient.getStarredRepos({ page: 4, perPage: 10 }),
       parallelClient.getStarredRepos({ page: 5, perPage: 10 }),
     ]);
-    
+
     const parDuration = performance.now() - parStart;
     console.log(`Parallel requests took: ${parDuration.toFixed(2)}ms`);
-    
+
     // Show comparison
     const speedup = seqDuration / parDuration;
     console.log(`Parallel is ${speedup.toFixed(2)}x faster`);
@@ -1048,39 +1066,39 @@ jobs:
         include:
           - os: ubuntu-latest
             deno-version: canary
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
           deno-version: ${{ matrix.deno-version }}
-      
+
       - name: Verify formatting
         run: deno fmt --check
-      
+
       - name: Run linter
         run: deno lint
-      
+
       - name: Type check
         run: deno check src/**/*.ts
-      
+
       - name: Run unit tests
         run: deno test --allow-env tests/unit/
-      
+
       - name: Run integration tests
         if: matrix.os == 'ubuntu-latest' && github.event_name == 'push'
         env:
           GITHUB_TOKEN: ${{ secrets.TEST_GITHUB_TOKEN }}
           RUN_INTEGRATION_TESTS: "true"
         run: deno test --allow-env --allow-net --allow-read --allow-write tests/integration/
-      
+
       - name: Generate coverage
         if: matrix.os == 'ubuntu-latest' && matrix.deno-version == 'v1.x'
         run: deno test --allow-env --coverage=coverage tests/unit/
-      
+
       - name: Create coverage report
         if: matrix.os == 'ubuntu-latest' && matrix.deno-version == 'v1.x'
         run: |

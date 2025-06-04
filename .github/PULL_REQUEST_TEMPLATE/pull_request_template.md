@@ -7,17 +7,23 @@ assignees: ''
 ---
 
 ## Description
+
 <!-- Provide a brief summary of your changes -->
 
 ## Related Issue(s)
+
 <!-- Please link to the issue(s) this PR addresses -->
+
 Fixes #
 
 ## Type of Change
+
 <!-- Please check the relevant options -->
+
 - [ ] Bug fix (non-breaking change that fixes an issue)
 - [ ] New feature (non-breaking change that adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
+- [ ] Breaking change (fix or feature that would cause existing functionality to
+      not work as expected)
 - [ ] Documentation update
 - [ ] Performance improvement
 - [ ] Code refactoring (no functional changes)
@@ -25,7 +31,9 @@ Fixes #
 - [ ] Other (please describe):
 
 ## Checklist
+
 <!-- Please check the relevant options -->
+
 - [ ] I have read the [CONTRIBUTING](../../CONTRIBUTING.md) document
 - [ ] My code follows the style guidelines of this project
 - [ ] I have performed a self-review of my code
@@ -37,7 +45,9 @@ Fixes #
 - [ ] Any dependent changes have been merged and published in downstream modules
 
 ## Testing
+
 <!-- Describe the tests you ran to verify your changes -->
 
 ## Additional Notes
+
 <!-- Add any other context about the PR here -->

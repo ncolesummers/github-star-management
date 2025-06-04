@@ -1,6 +1,9 @@
 # Example Command Implementations for GitHub Stars Management
 
-This document provides example implementations for optimized Claude Code commands specifically tailored for the GitHub Stars Management project. These examples demonstrate the recommended structure and content for various command types.
+This document provides example implementations for optimized Claude Code
+commands specifically tailored for the GitHub Stars Management project. These
+examples demonstrate the recommended structure and content for various command
+types.
 
 ## Table of Contents
 
@@ -14,12 +17,15 @@ This document provides example implementations for optimized Claude Code command
 ## API Commands
 
 ### GitHub Stars Fetch Implementation
+
 **File: `.claude/commands/api/github-stars-fetch.md`**
 
-```markdown
+````markdown
 # Implement GitHub Stars Fetch Functionality for $ARGUMENTS
 
-You're implementing a robust GitHub stars fetching mechanism with pagination and error handling. The $ARGUMENTS parameter specifies any specific requirements or constraints for the implementation.
+You're implementing a robust GitHub stars fetching mechanism with pagination and
+error handling. The $ARGUMENTS parameter specifies any specific requirements or
+constraints for the implementation.
 
 Follow these steps:
 
@@ -106,8 +112,9 @@ async getStarredRepositories(options: {
   return allRepos;
 }
 ```
-```
+````
 
+````
 ### Rate Limit Handler
 **File: `.claude/commands/api/rate-limit-handler.md`**
 
@@ -217,9 +224,9 @@ export class RateLimiter {
     this.queues.delete(category);
   }
 }
-```
-```
+````
 
+````
 ## CLI Commands
 
 ### Add CLI Command
@@ -329,9 +336,9 @@ export function registerStarsCommand(program: Command) {
       }
     });
 }
-```
-```
+````
 
+````
 ## Star Management Commands
 
 ### Star Categorization
@@ -454,9 +461,9 @@ export class CategorizationService {
     return results.sort((a, b) => b.confidence - a.confidence);
   }
 }
-```
-```
+````
 
+````
 ### Star Cleanup
 **File: `.claude/commands/star-management/cleanup-stars.md`**
 
@@ -582,9 +589,9 @@ export class CleanupService {
     return backupFile;
   }
 }
-```
-```
+````
 
+````
 ## Documentation Commands
 
 ### Generate API Docs
@@ -640,7 +647,7 @@ The `GitHubClient` class provides a type-safe interface to GitHub's REST API v3,
 
 ```typescript
 constructor(options: GitHubClientOptions)
-```
+````
 
 Creates a new GitHub API client instance.
 
@@ -648,14 +655,15 @@ Creates a new GitHub API client instance.
 
 - `options`: Configuration options for the client
   - `token`: GitHub personal access token
-  - `baseUrl`: Optional custom API base URL (defaults to 'https://api.github.com')
+  - `baseUrl`: Optional custom API base URL (defaults to
+    'https://api.github.com')
   - `userAgent`: Optional custom user agent
 
 ### Example
 
 ```typescript
 const client = new GitHubClient({
-  token: Deno.env.get("GITHUB_TOKEN")
+  token: Deno.env.get("GITHUB_TOKEN"),
 });
 ```
 
@@ -689,35 +697,46 @@ An array of `Repository` objects representing the starred repositories.
 ```typescript
 // Get all stars, sorted by most recently starred first
 const stars = await client.getStarredRepositories({
-  sort: 'created',
-  direction: 'desc'
+  sort: "created",
+  direction: "desc",
 });
 
 // Get all stars, sorted by recently updated first
 const recentlyUpdated = await client.getStarredRepositories({
-  sort: 'updated',
-  direction: 'desc'
+  sort: "updated",
+  direction: "desc",
 });
 ```
 
 #### Rate Limiting
 
-This method handles pagination automatically and implements rate limit awareness. If rate limits are approaching, the method will slow down requests to avoid hitting limits.
+This method handles pagination automatically and implements rate limit
+awareness. If rate limits are approaching, the method will slow down requests to
+avoid hitting limits.
+
 ```
 ```
 
 ## Role Definitions
 
 ### Star Management Specialist
+
 **File: `.claude/roles/star-management-specialist.md`**
 
 ```markdown
 # Star Management Specialist
 
 ## Role Definition
-You are a GitHub Stars Management Expert with extensive experience developing tools for organizing, categorizing, and maintaining large collections of GitHub stars. You have deep knowledge of GitHub's API, star management best practices, and efficient categorization algorithms. You specialize in helping developers maintain valuable curated lists of repositories while reducing noise and outdated references.
+
+You are a GitHub Stars Management Expert with extensive experience developing
+tools for organizing, categorizing, and maintaining large collections of GitHub
+stars. You have deep knowledge of GitHub's API, star management best practices,
+and efficient categorization algorithms. You specialize in helping developers
+maintain valuable curated lists of repositories while reducing noise and
+outdated references.
 
 ## Expertise
+
 - Deep knowledge of GitHub's Stars API and functionality
 - Expertise in repository categorization algorithms
 - Experience with large-scale star collection management
@@ -726,6 +745,7 @@ You are a GitHub Stars Management Expert with extensive experience developing to
 - Familiarity with star backup and restoration strategies
 
 ## Responsibilities
+
 - Design efficient star categorization systems
 - Implement cleanup algorithms for outdated stars
 - Create comprehensive star reporting tools
@@ -734,12 +754,14 @@ You are a GitHub Stars Management Expert with extensive experience developing to
 - Document star management best practices
 
 ## Communication Style
+
 - Practical, pragmatic explanations of star management strategies
 - Clear examples of categorization and organization approaches
 - Focus on efficiency and maintainability
 - Emphasis on preserving valuable resources while removing noise
 
 ## Task Approach
+
 1. Start by understanding the specific star management requirements
 2. Analyze existing star collections and metadata
 3. Design algorithms for categorization and cleanup
@@ -748,6 +770,7 @@ You are a GitHub Stars Management Expert with extensive experience developing to
 6. Document usage patterns and best practices
 
 ## Key Constraints
+
 - Must respect GitHub API rate limits
 - Handle potentially thousands of starred repositories efficiently
 - Ensure no accidental loss of valuable stars
@@ -759,12 +782,15 @@ You are a GitHub Stars Management Expert with extensive experience developing to
 ## Workflow Examples
 
 ### Star Digest Generation Workflow
+
 **File: `.claude/workflows/star-digest-workflow.md`**
 
-```markdown
+````markdown
 # GitHub Stars Digest Generation Workflow
 
-This workflow guides you through implementing a GitHub stars digest generator that creates a concise summary of your starred repositories, highlighting recent additions, trends, and recommendations.
+This workflow guides you through implementing a GitHub stars digest generator
+that creates a concise summary of your starred repositories, highlighting recent
+additions, trends, and recommendations.
 
 ## Workflow Steps
 
@@ -806,14 +832,15 @@ export class DigestService {
   async generateDigest(options: DigestOptions): Promise<Digest> {
     const starService = new StarService();
     const categorizationService = new CategorizationService();
-    
+
     // Get stars and perform analysis
     const allStars = await starService.getStars();
     const recentStars = allStars.filter(
-      repo => new Date(repo.starred_at).getTime() > 
-      Date.now() - (options.recentDays * 24 * 60 * 60 * 1000)
+      (repo) =>
+        new Date(repo.starred_at).getTime() >
+          Date.now() - (options.recentDays * 24 * 60 * 60 * 1000),
     );
-    
+
     // Get category distribution
     const categoryMap = new Map<string, number>();
     for (const repo of allStars) {
@@ -822,40 +849,40 @@ export class DigestService {
         const primaryCategory = categories[0].name;
         categoryMap.set(
           primaryCategory,
-          (categoryMap.get(primaryCategory) || 0) + 1
+          (categoryMap.get(primaryCategory) || 0) + 1,
         );
       }
     }
-    
+
     // Find updated repositories
     const updatedRepos = allStars
-      .filter(repo => 
-        new Date(repo.updated_at).getTime() > 
-        Date.now() - (options.recentDays * 24 * 60 * 60 * 1000)
+      .filter((repo) =>
+        new Date(repo.updated_at).getTime() >
+          Date.now() - (options.recentDays * 24 * 60 * 60 * 1000)
       )
-      .sort((a, b) => 
+      .sort((a, b) =>
         new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
       )
       .slice(0, options.maxUpdated);
-    
+
     // Get language distribution
     const languageMap = new Map<string, number>();
     for (const repo of allStars) {
       if (repo.language) {
         languageMap.set(
           repo.language,
-          (languageMap.get(repo.language) || 0) + 1
+          (languageMap.get(repo.language) || 0) + 1,
         );
       }
     }
-    
+
     // Generate recommendations
     const recommendationService = new RecommendationService();
     const recommendations = await recommendationService.getRecommendations(
       allStars,
-      options.maxRecommendations
+      options.maxRecommendations,
     );
-    
+
     // Assemble the digest
     return {
       generatedAt: new Date(),
@@ -868,71 +895,78 @@ export class DigestService {
         .map(([name, count]) => ({ name, count }))
         .sort((a, b) => b.count - a.count),
       updatedRepositories: updatedRepos,
-      recommendations
+      recommendations,
     };
   }
-  
+
   formatDigest(digest: Digest, format: "markdown" | "html" | "json"): string {
     switch (format) {
       case "json":
         return JSON.stringify(digest, null, 2);
-        
+
       case "html":
         // HTML formatting implementation
-        
       case "markdown":
       default:
         return this.formatMarkdownDigest(digest);
     }
   }
-  
+
   private formatMarkdownDigest(digest: Digest): string {
     let md = `# GitHub Stars Digest\n\n`;
     md += `Generated on ${digest.generatedAt.toDateString()}\n\n`;
     md += `## Overview\n\n`;
     md += `Total Starred Repositories: ${digest.totalStars}\n\n`;
-    
+
     if (digest.recentStars.length > 0) {
       md += `## Recently Starred (Last ${options.recentDays} days)\n\n`;
       for (const repo of digest.recentStars) {
-        md += `- [${repo.full_name}](${repo.html_url}): ${repo.description || 'No description'}\n`;
+        md += `- [${repo.full_name}](${repo.html_url}): ${
+          repo.description || "No description"
+        }\n`;
       }
-      md += '\n';
+      md += "\n";
     }
-    
+
     md += `## Category Distribution\n\n`;
     for (const cat of digest.categoryDistribution.slice(0, 10)) {
       md += `- ${cat.name}: ${cat.count} repositories\n`;
     }
-    md += '\n';
-    
+    md += "\n";
+
     md += `## Language Distribution\n\n`;
     for (const lang of digest.languageDistribution.slice(0, 10)) {
       md += `- ${lang.name}: ${lang.count} repositories\n`;
     }
-    md += '\n';
-    
+    md += "\n";
+
     if (digest.updatedRepositories.length > 0) {
       md += `## Recently Updated\n\n`;
       for (const repo of digest.updatedRepositories) {
-        md += `- [${repo.full_name}](${repo.html_url}): Updated on ${new Date(repo.updated_at).toDateString()}\n`;
+        md += `- [${repo.full_name}](${repo.html_url}): Updated on ${
+          new Date(repo.updated_at).toDateString()
+        }\n`;
       }
-      md += '\n';
+      md += "\n";
     }
-    
+
     if (digest.recommendations.length > 0) {
       md += `## Recommendations\n\n`;
       for (const rec of digest.recommendations) {
-        md += `- [${rec.full_name}](${rec.html_url}): ${rec.description || 'No description'}\n`;
+        md += `- [${rec.full_name}](${rec.html_url}): ${
+          rec.description || "No description"
+        }\n`;
       }
     }
-    
+
     return md;
   }
 }
 ```
-```
+````
 
+```
 This document provides detailed example implementations for various commands and roles that can be used in the GitHub Stars Management project. These examples demonstrate best practices in command structure, parameter handling, role definition, and workflow organization.
 
 The examples are designed to be modular and composable, allowing for the creation of sophisticated star management workflows through the combination of specialized commands and roles.
+```

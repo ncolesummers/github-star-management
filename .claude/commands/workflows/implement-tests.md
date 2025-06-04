@@ -1,6 +1,7 @@
 # Implement Tests
 
-This workflow guides you through implementing tests for the GitHub Stars Management project using Deno's built-in testing framework.
+This workflow guides you through implementing tests for the GitHub Stars
+Management project using Deno's built-in testing framework.
 
 ## Workflow Steps
 
@@ -54,35 +55,35 @@ Deno.test("StarService.cleanupStars - identifies and removes archived repos", as
   // Arrange
   const mockClient = new MockGitHubClient();
   const unstarSpy = spy(mockClient, "unstarRepo");
-  
+
   // Setup mock data - mix of archived and active repos
   mockClient.addMockResponse("getAllStarredRepos", [
-    { ...mockRepos[0], archived: true },  // Should be removed
+    { ...mockRepos[0], archived: true }, // Should be removed
     { ...mockRepos[1], archived: false }, // Should be kept
-    { ...mockRepos[2], archived: true }   // Should be removed
+    { ...mockRepos[2], archived: true }, // Should be removed
   ]);
-  
+
   const service = new StarService({
     client: mockClient,
   });
-  
+
   // Act
   const result = await service.cleanupStars({
     dryRun: false,
   });
-  
+
   // Assert
   assertEquals(result.totalReviewed, 3);
   assertEquals(result.archived, 2);
   assertEquals(result.removed, 2);
   assertEquals(unstarSpy.calls.length, 2);
-  
+
   // Check that the right repos were unstarred
   assertSpyCall(unstarSpy, 0, {
-    args: [mockRepos[0].owner.login, mockRepos[0].name]
+    args: [mockRepos[0].owner.login, mockRepos[0].name],
   });
   assertSpyCall(unstarSpy, 1, {
-    args: [mockRepos[2].owner.login, mockRepos[2].name]
+    args: [mockRepos[2].owner.login, mockRepos[2].name],
   });
 });
 
@@ -90,22 +91,22 @@ Deno.test("StarService.cleanupStars - respects dry run mode", async () => {
   // Arrange
   const mockClient = new MockGitHubClient();
   const unstarSpy = spy(mockClient, "unstarRepo");
-  
+
   // All repos are archived (would normally be removed)
   mockClient.addMockResponse("getAllStarredRepos", [
     { ...mockRepos[0], archived: true },
-    { ...mockRepos[1], archived: true }
+    { ...mockRepos[1], archived: true },
   ]);
-  
+
   const service = new StarService({
     client: mockClient,
   });
-  
+
   // Act - with dry run enabled
   const result = await service.cleanupStars({
     dryRun: true,
   });
-  
+
   // Assert - should identify repos but not call unstar
   assertEquals(result.totalReviewed, 2);
   assertEquals(result.archived, 2);

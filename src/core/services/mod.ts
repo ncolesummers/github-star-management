@@ -1,6 +1,6 @@
 /**
  * Service layer
- * 
+ *
  * This module exports service classes that implement business logic
  * for GitHub star management operations.
  */

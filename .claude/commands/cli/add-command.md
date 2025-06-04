@@ -1,6 +1,7 @@
 # Implement New CLI Command: $ARGUMENTS
 
-You're implementing a new CLI command for the GitHub Stars Management project. The $ARGUMENTS parameter specifies the command name and its purpose.
+You're implementing a new CLI command for the GitHub Stars Management project.
+The $ARGUMENTS parameter specifies the command name and its purpose.
 
 Follow these steps:
 
@@ -52,15 +53,27 @@ export function registerStarsCommand(program: Command) {
       console.log("  cleanup  - Find candidates for unstarring");
       console.log("  report   - Generate a report of your stars");
     });
-  
+
   program
     .command("stars:list")
     .description("List your GitHub starred repositories")
     .option("-c, --category <category:string>", "Filter by category")
     .option("-l, --language <language:string>", "Filter by language")
-    .option("-s, --sort <sort:string>", "Sort by: 'created', 'updated'", "created")
-    .option("-d, --direction <direction:string>", "Sort direction: 'asc', 'desc'", "desc")
-    .option("-f, --format <format:string>", "Output format: 'table', 'json', 'md'", "table")
+    .option(
+      "-s, --sort <sort:string>",
+      "Sort by: 'created', 'updated'",
+      "created",
+    )
+    .option(
+      "-d, --direction <direction:string>",
+      "Sort direction: 'asc', 'desc'",
+      "desc",
+    )
+    .option(
+      "-f, --format <format:string>",
+      "Output format: 'table', 'json', 'md'",
+      "table",
+    )
     .action(async (options) => {
       try {
         const starService = new StarService();
@@ -70,7 +83,7 @@ export function registerStarsCommand(program: Command) {
           sort: options.sort,
           direction: options.direction,
         });
-        
+
         // Format output based on selected format
         switch (options.format) {
           case "json":
@@ -81,19 +94,23 @@ export function registerStarsCommand(program: Command) {
             for (const star of stars) {
               console.log(`## [${star.name}](${star.html_url})`);
               console.log(`${star.description || "No description"}\n`);
-              console.log(`- **Language:** ${star.language || "Not specified"}`);
+              console.log(
+                `- **Language:** ${star.language || "Not specified"}`,
+              );
               console.log(`- **Stars:** ${star.stargazers_count}`);
-              console.log(`- **Updated:** ${new Date(star.updated_at).toDateString()}\n`);
+              console.log(
+                `- **Updated:** ${new Date(star.updated_at).toDateString()}\n`,
+              );
             }
             break;
           case "table":
           default:
-            console.table(stars.map(s => ({
+            console.table(stars.map((s) => ({
               Name: s.name,
               Owner: s.owner.login,
               Language: s.language || "-",
               Stars: s.stargazers_count,
-              Updated: new Date(s.updated_at).toDateString()
+              Updated: new Date(s.updated_at).toDateString(),
             })));
         }
       } catch (error) {

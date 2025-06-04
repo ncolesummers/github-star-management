@@ -6,9 +6,12 @@ A modern CLI tool for managing your GitHub stars, written in Deno TypeScript.
 
 - 🧹 **Star Cleanup**: Remove stars from archived or outdated repositories
 - 💾 **Star Backup & Restore**: Export and import your stars
-- 📚 **Star Categorization**: Generate topical lists of your starred repositories
-- 📊 **Star Reporting**: Generate statistics and insights about your starred repositories
-- 📰 **Star Digest**: Create digests of trending repositories in your areas of interest
+- 📚 **Star Categorization**: Generate topical lists of your starred
+  repositories
+- 📊 **Star Reporting**: Generate statistics and insights about your starred
+  repositories
+- 📰 **Star Digest**: Create digests of trending repositories in your areas of
+  interest
 - ⚡️ **Rate Limiting**: Built-in protection against GitHub API rate limits
 - 🔄 **Cross-Platform**: Works on macOS, Windows, and Linux
 
@@ -177,15 +180,24 @@ Options:
 
 ## Configuration
 
-Create a `.star-management.json` file in your home directory or project directory:
+Create a `.star-management.json` file in your home directory or project
+directory:
 
 ```json
 {
   "token": "your_github_token",
   "rateLimit": 10,
   "categories": [
-    { "name": "ai", "pattern": "ai|machine-learning|ml", "displayName": "AI & Machine Learning" },
-    { "name": "typescript", "pattern": "typescript|ts|deno", "displayName": "TypeScript" }
+    {
+      "name": "ai",
+      "pattern": "ai|machine-learning|ml",
+      "displayName": "AI & Machine Learning"
+    },
+    {
+      "name": "typescript",
+      "pattern": "typescript|ts|deno",
+      "displayName": "TypeScript"
+    }
   ],
   "interests": ["typescript", "python", "golang", "ai", "devops"],
   "cleanup": {
@@ -197,7 +209,8 @@ Create a `.star-management.json` file in your home directory or project director
 
 ## GitHub Actions Integration
 
-You can automate star management with GitHub Actions. See the workflows in `.github/workflows/` for examples.
+You can automate star management with GitHub Actions. See the workflows in
+`.github/workflows/` for examples.
 
 ## Development
 
@@ -224,7 +237,8 @@ deno task fmt
 
 ### Testing
 
-This project uses Deno's built-in testing framework with a comprehensive test suite:
+This project uses Deno's built-in testing framework with a comprehensive test
+suite:
 
 ```bash
 # Run unit tests
@@ -236,6 +250,7 @@ RUN_INTEGRATION_TESTS=true deno test --allow-env --allow-net --allow-read --allo
 ```
 
 The test suite includes:
+
 - **Unit tests**: Tests individual components in isolation using mocks
 - **Integration tests**: Tests real API interactions (disabled by default)
 - **Mock helpers**: Tools for simulating API responses and CLI outputs
@@ -245,14 +260,18 @@ For more details, see the [testing documentation](tests/README.md).
 
 ### Commit Convention
 
-We follow [Conventional Commits](https://www.conventionalcommits.org/) for all commit messages. This helps us maintain a clear project history and automate versioning and changelog generation.
+We follow [Conventional Commits](https://www.conventionalcommits.org/) for all
+commit messages. This helps us maintain a clear project history and automate
+versioning and changelog generation.
 
 Example of a commit message:
+
 ```
 feat(cli): add support for custom output formats
 ```
 
-See our [Contributing Guide](CONTRIBUTING.md#commit-guidelines) for detailed information on commit message format.
+See our [Contributing Guide](CONTRIBUTING.md#commit-guidelines) for detailed
+information on commit message format.
 
 ## License
 
@@ -260,4 +279,6 @@ MIT
 
 ## Acknowledgements
 
-This project started as a collection of shell scripts and has been migrated to Deno TypeScript for improved performance, type safety, and cross-platform compatibility.
+This project started as a collection of shell scripts and has been migrated to
+Deno TypeScript for improved performance, type safety, and cross-platform
+compatibility.

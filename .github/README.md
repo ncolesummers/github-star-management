@@ -1,12 +1,14 @@
 # GitHub Actions Workflows
 
-This directory contains GitHub Actions workflows for automating various aspects of the GitHub Stars Management project.
+This directory contains GitHub Actions workflows for automating various aspects
+of the GitHub Stars Management project.
 
 ## Available Workflows
 
 ### 1. Deno CI (`deno-ci.yml`)
 
 Runs on pushes to main branch and pull requests:
+
 - Verifies code formatting
 - Runs linter
 - Executes tests
@@ -14,6 +16,7 @@ Runs on pushes to main branch and pull requests:
 ### 2. Star Cleanup (`star-cleanup.yml`)
 
 Automates the cleanup of old GitHub stars:
+
 - Runs quarterly (Jan, Apr, Jul, Oct)
 - Supports manual triggering with options
 - Creates cleanup reports
@@ -22,6 +25,7 @@ Automates the cleanup of old GitHub stars:
 ### 3. Star Management (`star-management.yml`)
 
 Provides manual operations for star management:
+
 - Supports multiple actions: cleanup, report, backup, categorize, digest
 - Creates artifacts with operation results
 - Notifies via issues for operation completion
@@ -29,6 +33,7 @@ Provides manual operations for star management:
 ### 4. Token Rotation (`token-rotation.yml`)
 
 Security reminder for GitHub token rotation:
+
 - Runs monthly as a reminder
 - Creates issues with detailed instructions
 - Supports manual triggering
@@ -53,6 +58,7 @@ Security reminder for GitHub token rotation:
 ## Customizing Workflows
 
 To modify these workflows:
+
 1. Fork this repository
 2. Edit the workflow YAML files
 3. Test your changes using the "workflow_dispatch" trigger

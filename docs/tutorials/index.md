@@ -1,6 +1,7 @@
 # Tutorials
 
-This section contains in-depth tutorials for specific use cases of GitHub Star Management.
+This section contains in-depth tutorials for specific use cases of GitHub Star
+Management.
 
 ## Beginner Tutorials
 

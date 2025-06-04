@@ -4,46 +4,46 @@ on:
   workflow_dispatch:
     inputs:
       action:
-        description: 'Action to perform'
+        description: "Action to perform"
         required: true
         type: choice
         options:
-          - 'cleanup'
-          - 'report'
-          - 'backup'
-          - 'categorize'
-          - 'digest'
+          - "cleanup"
+          - "report"
+          - "backup"
+          - "categorize"
+          - "digest"
       dry_run:
-        description: 'Dry run mode'
+        description: "Dry run mode"
         required: false
-        default: 'true'
+        default: "true"
         type: choice
         options:
-          - 'true'
-          - 'false'
+          - "true"
+          - "false"
       output_path:
-        description: 'Output path for backups and reports'
+        description: "Output path for backups and reports"
         required: false
-        default: './output'
+        default: "./output"
         type: string
 
 jobs:
   star-management:
     runs-on: ubuntu-latest
     name: Star Management - ${{ github.event.inputs.action }}
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
+
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
           deno-version: v1.x
-      
+
       - name: Create output directory
         run: mkdir -p ${{ github.event.inputs.output_path }}
-      
+
       - name: Run selected action
         env:
           GITHUB_TOKEN: ${{ secrets.STAR_MANAGEMENT_TOKEN }}
@@ -68,7 +68,7 @@ jobs:
               deno task start digest --output=$OUTPUT_PATH/star-digest.md
               ;;
           esac
-      
+
       - name: Upload artifacts
         if: success()
         uses: actions/upload-artifact@v4
@@ -76,7 +76,7 @@ jobs:
           name: star-management-output
           path: ${{ github.event.inputs.output_path }}
           retention-days: 30
-      
+
       - name: Create result issue
         if: success() && github.event.inputs.action != 'cleanup' && github.event.inputs.dry_run == 'false'
         uses: actions/github-script@v7
@@ -86,10 +86,10 @@ jobs:
             const fs = require('fs');
             const date = new Date().toISOString().split('T')[0];
             const action = process.env.ACTION.charAt(0).toUpperCase() + process.env.ACTION.slice(1);
-            
+
             let resultSummary = "Operation completed successfully.";
             const outputPath = process.env.OUTPUT_PATH;
-            
+
             // Try to get summary from the output files based on the action
             try {
               if (process.env.ACTION === 'report' && fs.existsSync(`${outputPath}/star-report.json`)) {
@@ -116,7 +116,7 @@ jobs:
             } catch (error) {
               console.error('Error reading result files:', error);
             }
-            
+
             const issue = await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -126,5 +126,5 @@ jobs:
                 `Results are available in the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) artifacts.`,
               labels: ['automation', `star-${process.env.ACTION}`]
             });
-            
+
             console.log(`Created issue #${issue.data.number}`);

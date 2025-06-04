@@ -1,6 +1,7 @@
 # GitHub Stars Management Guide with gh CLI
 
 ## Table of Contents
+
 1. [Prerequisites & Setup](#prerequisites--setup)
 2. [Basic Star Operations](#basic-star-operations)
 3. [Bulk Star Management](#bulk-star-management)
@@ -11,6 +12,7 @@
 ## Prerequisites & Setup
 
 ### Install GitHub CLI
+
 ```bash
 # macOS
 brew install gh
@@ -26,11 +28,13 @@ sudo apt install gh
 ```
 
 ### Authenticate
+
 ```bash
 gh auth login
 ```
 
 ### Install Useful Extensions
+
 ```bash
 # Star management extension
 gh extension install mislav/gh-starred
@@ -42,6 +46,7 @@ gh extension install dlvhdr/gh-dash
 ## Basic Star Operations
 
 ### View Your Stars
+
 ```bash
 # List all starred repositories
 gh api user/starred --paginate | jq -r '.[].full_name'
@@ -54,6 +59,7 @@ gh api user/starred --paginate | jq '. | length'
 ```
 
 ### Star/Unstar Repositories
+
 ```bash
 # Star a repository
 gh api -X PUT /user/starred/owner/repo
@@ -68,6 +74,7 @@ gh api /user/starred/owner/repo --silent && echo "Starred" || echo "Not starred"
 ## Bulk Star Management
 
 ### Script to Remove Old/Archived Stars
+
 Create a file called `cleanup-stars.sh`:
 
 ```bash
@@ -122,6 +129,7 @@ echo "   - $ARCHIVED_COUNT were archived repositories"
 ```
 
 ### Make it executable:
+
 ```bash
 chmod +x cleanup-stars.sh
 ./cleanup-stars.sh
@@ -130,6 +138,7 @@ chmod +x cleanup-stars.sh
 ## Creating Topical Star Lists
 
 ### Export Stars by Category
+
 Create a file called `categorize-stars.sh`:
 
 ```bash
@@ -196,6 +205,7 @@ echo "✅ Categorization complete! Check the $OUTPUT_DIR directory."
 ```
 
 ### Generate Shareable Lists
+
 Create a file called `generate-awesome-list.sh`:
 
 ```bash
@@ -258,6 +268,7 @@ echo "✅ Generated $OUTPUT_FILE"
 ### Essential Repositories for TS/Python/Go Leadership
 
 #### TypeScript Excellence
+
 ```bash
 # Star these repositories to showcase TypeScript expertise
 gh api -X PUT /user/starred/microsoft/TypeScript
@@ -272,6 +283,7 @@ gh api -X PUT /user/starred/pmndrs/zustand
 ```
 
 #### Python Mastery
+
 ```bash
 # Star these repositories to showcase Python expertise
 gh api -X PUT /user/starred/python/cpython
@@ -286,6 +298,7 @@ gh api -X PUT /user/starred/pypa/pipenv
 ```
 
 #### Go Leadership
+
 ```bash
 # Star these repositories to showcase Go expertise
 gh api -X PUT /user/starred/golang/go
@@ -300,6 +313,7 @@ gh api -X PUT /user/starred/go-kit/kit
 ```
 
 #### AI/ML Integration
+
 ```bash
 # Star these for AI development lifecycle expertise
 gh api -X PUT /user/starred/huggingface/transformers
@@ -315,6 +329,7 @@ gh api -X PUT /user/starred/mlflow/mlflow
 ## Automation Scripts
 
 ### Daily Star Digest
+
 Create `star-digest.sh` to track new interesting repositories:
 
 ```bash
@@ -342,6 +357,7 @@ echo "✅ Generated $OUTPUT"
 ```
 
 ### Weekly Star Report
+
 Create `star-report.sh` to analyze your starring patterns:
 
 ```bash

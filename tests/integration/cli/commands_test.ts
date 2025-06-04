@@ -1,11 +1,14 @@
 /**
  * Integration tests for CLI commands
- * 
+ *
  * These tests verify that the CLI commands work correctly with the
  * actual implementation. They are only run when explicitly enabled.
  */
 
-import { assertEquals, assertStringIncludes } from "https://deno.land/std/assert/mod.ts";
+import {
+  assertEquals,
+  assertStringIncludes,
+} from "https://deno.land/std/assert/mod.ts";
 import { StringWriter } from "../../helpers/string_writer.ts";
 import { withTempFile } from "../../helpers/temp_file.ts";
 
@@ -24,7 +27,7 @@ interface TestContext {
 function createTestContext(args: string[] = []): TestContext {
   const stdout = new StringWriter();
   const stderr = new StringWriter();
-  
+
   return {
     args,
     flags: {},
@@ -55,26 +58,29 @@ Deno.test({
     await withTempFile(async (tempFile) => {
       // Arrange
       const ctx = createTestContext(["--output", tempFile, "--limit", "3"]);
-      
+
       // This will need to be updated once we implement the backup command
       const backup = async (_ctx: TestContext): Promise<number> => {
         // Placeholder implementation
-        await Deno.writeTextFile(tempFile, JSON.stringify([
-          { id: 1, name: "test-repo" }
-        ]));
+        await Deno.writeTextFile(
+          tempFile,
+          JSON.stringify([
+            { id: 1, name: "test-repo" },
+          ]),
+        );
         return 0;
       };
-      
+
       // Act
       const exitCode = await backup(ctx);
-      
+
       // Assert
       assertEquals(exitCode, 0);
-      
+
       // Verify file exists and contains valid JSON
       const fileContent = await Deno.readTextFile(tempFile);
       const backupData = JSON.parse(fileContent);
-      
+
       assertEquals(Array.isArray(backupData), true);
       if (backupData.length > 0) {
         assertEquals(typeof backupData[0].name, "string");
@@ -90,20 +96,24 @@ Deno.test({
   async fn() {
     // Arrange
     const ctx = createTestContext(["--dry-run", "--cutoff-months", "36"]);
-    
+
     // This will need to be updated once we implement the cleanup command
     const cleanup = async (ctx: TestContext): Promise<number> => {
       // Placeholder implementation
-      await ctx.stdout.write(new TextEncoder().encode("DRY RUN: Would remove 3 stars\nCleanup complete"));
+      await ctx.stdout.write(
+        new TextEncoder().encode(
+          "DRY RUN: Would remove 3 stars\nCleanup complete",
+        ),
+      );
       return 0;
     };
-    
+
     // Act
     const exitCode = await cleanup(ctx);
-    
+
     // Assert
     assertEquals(exitCode, 0);
-    
+
     // Verify stdout contains dry run message
     const stdout = ctx.getStdout();
     assertStringIncludes(stdout, "DRY RUN");

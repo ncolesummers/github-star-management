@@ -1,16 +1,19 @@
 # User Guides
 
-This section contains step-by-step guides for common tasks with GitHub Star Management.
+This section contains step-by-step guides for common tasks with GitHub Star
+Management.
 
 ## Getting Started
 
 - [Installation](installation.md) - Set up GitHub Star Management on your system
 - [Authentication](authentication.md) - Create and use a GitHub token
-- [Configuration](configuration.md) - Configure GitHub Star Management for your needs
+- [Configuration](configuration.md) - Configure GitHub Star Management for your
+  needs
 
 ## Core Functionality
 
-- [Backup and Restore](backup-restore.md) - Back up and restore your GitHub stars
+- [Backup and Restore](backup-restore.md) - Back up and restore your GitHub
+  stars
 - [Cleanup](cleanup.md) - Clean up outdated and archived stars
 - [Categorization](categorization.md) - Organize stars into categories
 - [Reporting](reporting.md) - Generate reports about your stars

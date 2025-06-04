@@ -1,6 +1,7 @@
 # GitHub API Client
 
-The `GitHubClient` class provides a TypeScript interface to the GitHub API with built-in rate limiting, pagination handling, and error management.
+The `GitHubClient` class provides a TypeScript interface to the GitHub API with
+built-in rate limiting, pagination handling, and error management.
 
 ## Class: `GitHubClient`
 
@@ -17,10 +18,13 @@ Creates a new instance of the GitHub API client.
 #### Parameters
 
 - `options`: Configuration options for the client
-  - `token?: string`: GitHub personal access token (falls back to `GITHUB_TOKEN` environment variable if not provided)
-  - `baseUrl?: string`: Base URL for the GitHub API (defaults to "https://api.github.com")
+  - `token?: string`: GitHub personal access token (falls back to `GITHUB_TOKEN`
+    environment variable if not provided)
+  - `baseUrl?: string`: Base URL for the GitHub API (defaults to
+    "https://api.github.com")
   - `rateLimit?: number`: Maximum requests per second (defaults to 10)
-  - `maxRetries?: number`: Maximum number of retries for failed requests (defaults to 3)
+  - `maxRetries?: number`: Maximum number of retries for failed requests
+    (defaults to 3)
 
 #### Example
 
@@ -34,7 +38,7 @@ const client = new GitHubClient();
 const customClient = new GitHubClient({
   token: "your-github-token",
   rateLimit: 5,
-  maxRetries: 5
+  maxRetries: 5,
 });
 ```
 
@@ -52,7 +56,8 @@ Fetches a page of the authenticated user's starred repositories.
 
 - `options`: Pagination and sorting options
   - `page?: number`: Page number (defaults to 1)
-  - `perPage?: number`: Number of results per page (defaults to 100, maximum 100)
+  - `perPage?: number`: Number of results per page (defaults to 100,
+    maximum 100)
   - `sort?: "created" | "updated"`: Sort by creation or update date
   - `direction?: "asc" | "desc"`: Sort direction (defaults to "desc")
 
@@ -70,7 +75,7 @@ const stars = await client.getStarredRepos();
 const moreStars = await client.getStarredRepos({
   page: 2,
   sort: "created",
-  direction: "desc"
+  direction: "desc",
 });
 ```
 
@@ -149,7 +154,8 @@ Checks if a repository is starred by the authenticated user.
 
 ##### Returns
 
-A promise that resolves to a boolean indicating whether the repository is starred.
+A promise that resolves to a boolean indicating whether the repository is
+starred.
 
 ##### Example
 
@@ -188,7 +194,8 @@ try {
 
 ## Rate Limiting
 
-The client uses a token bucket algorithm to respect GitHub's rate limits. You can configure the rate limit when creating the client:
+The client uses a token bucket algorithm to respect GitHub's rate limits. You
+can configure the rate limit when creating the client:
 
 ```typescript
 // Limit to 5 requests per second

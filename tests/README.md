@@ -1,6 +1,8 @@
 # Testing for GitHub Stars Management
 
-This directory contains tests for the GitHub Stars Management project. The testing framework uses Deno's built-in testing capabilities and follows the testing philosophy outlined in `docs/testing.md`.
+This directory contains tests for the GitHub Stars Management project. The
+testing framework uses Deno's built-in testing capabilities and follows the
+testing philosophy outlined in `docs/testing.md`.
 
 ## Directory Structure
 
@@ -34,11 +36,13 @@ Unit tests can be run with:
 deno test --allow-env tests/unit/
 ```
 
-These tests use mocks and don't make actual network requests, so they don't require network permissions.
+These tests use mocks and don't make actual network requests, so they don't
+require network permissions.
 
 ### Integration Tests
 
-Integration tests require a GitHub token and make actual API requests. They are disabled by default and only run when explicitly enabled:
+Integration tests require a GitHub token and make actual API requests. They are
+disabled by default and only run when explicitly enabled:
 
 ```bash
 # Set your GitHub token
@@ -48,7 +52,8 @@ export GITHUB_TOKEN=your_github_token
 RUN_INTEGRATION_TESTS=true deno test --allow-env --allow-net --allow-read --allow-write tests/integration/
 ```
 
-**Important:** Integration tests will make real API calls and may modify your GitHub starred repositories. Use a test account if possible.
+**Important:** Integration tests will make real API calls and may modify your
+GitHub starred repositories. Use a test account if possible.
 
 ## Test Helpers
 
@@ -65,13 +70,13 @@ const mockFetch = new MockFetch();
 // Mock a successful response
 mockFetch.mock("https://api.github.com/user", {
   status: 200,
-  body: { login: "testuser" }
+  body: { login: "testuser" },
 });
 
 // Mock a sequence of responses (for testing retry logic)
 mockFetch.mockSequence("https://api.github.com/rate_limit", [
   { status: 403, headers: { "x-ratelimit-remaining": "0" } },
-  { status: 200, body: { resources: { core: { remaining: 60 } } } }
+  { status: 200, body: { resources: { core: { remaining: 60 } } } },
 ]);
 
 // Use the mock in tests
@@ -104,16 +109,17 @@ assertEquals(stdout.toString(), "Expected output");
 
 ### Temporary Files
 
-The `temp_file.ts` helper provides utilities for creating and cleaning up temporary files during tests:
+The `temp_file.ts` helper provides utilities for creating and cleaning up
+temporary files during tests:
 
 ```typescript
-import { withTempFile, withTempDir } from "../helpers/temp_file.ts";
+import { withTempDir, withTempFile } from "../helpers/temp_file.ts";
 
 // Use a temporary file that will be automatically cleaned up
 await withTempFile(async (filePath) => {
   // Use the file path in your test
   await Deno.writeTextFile(filePath, "test data");
-  
+
   // File will be deleted after this function completes
 });
 
@@ -152,7 +158,11 @@ assertEquals(mockClient.getCallArgs("unstarRepo", 0), ["owner", "repo"]);
 Test fixtures provide consistent test data:
 
 ```typescript
-import { mockRepos, errorResponses, createPaginatedRepos } from "../fixtures/repositories.ts";
+import {
+  createPaginatedRepos,
+  errorResponses,
+  mockRepos,
+} from "../fixtures/repositories.ts";
 
 // Use mock repositories
 const testRepo = mockRepos[0];
@@ -166,18 +176,23 @@ const pages = createPaginatedRepos(100, 30); // 100 repos, 30 per page
 
 ## Best Practices
 
-1. **Independence**: Each test should be independent and not rely on the state from other tests.
+1. **Independence**: Each test should be independent and not rely on the state
+   from other tests.
 2. **Mocking**: Always mock external services in unit tests.
-3. **Cleanup**: Use the `finally` block to clean up resources and restore global state.
+3. **Cleanup**: Use the `finally` block to clean up resources and restore global
+   state.
 4. **Assertions**: Make specific assertions that verify the expected behavior.
 5. **Coverage**: Aim to test both success and error paths.
-6. **Descriptive Names**: Use descriptive test names that explain what is being tested.
+6. **Descriptive Names**: Use descriptive test names that explain what is being
+   tested.
 7. **Isolation**: Keep integration tests separate from unit tests.
 8. **Documentation**: Document special setup or teardown requirements for tests.
 
 ## GitHub Actions
 
-A GitHub Actions workflow is included in `.github/workflows/test.yml` to automatically run tests on pull requests and pushes to the main branch. The workflow runs:
+A GitHub Actions workflow is included in `.github/workflows/test.yml` to
+automatically run tests on pull requests and pushes to the main branch. The
+workflow runs:
 
 1. Linting and formatting checks
 2. Type checking

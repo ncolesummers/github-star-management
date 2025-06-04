@@ -1,12 +1,15 @@
 # Implement Rate Limit Handler for $ARGUMENTS
 
-You're implementing a sophisticated rate limit handling system for GitHub API requests. The $ARGUMENTS parameter specifies the specific endpoints or use cases to focus on.
+You're implementing a sophisticated rate limit handling system for GitHub API
+requests. The $ARGUMENTS parameter specifies the specific endpoints or use cases
+to focus on.
 
 Follow these steps:
 
 1. **GitHub Rate Limit Analysis**
    - Understand GitHub's rate limit system (core, search, graphql)
-   - Review rate limit headers (x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset)
+   - Review rate limit headers (x-ratelimit-limit, x-ratelimit-remaining,
+     x-ratelimit-reset)
    - Consider secondary rate limits and abuse detection
    - Think about how rate limits apply to $ARGUMENTS specifically
 
@@ -44,20 +47,20 @@ export class RateLimiter {
     remaining: number;
     reset: number;
   }> = new Map();
-  
+
   private queues: Map<string, Promise<void>> = new Map();
-  
+
   // Update rate limits based on response headers
   updateLimits(category: string, headers: Headers): void {
-    const limit = parseInt(headers.get('x-ratelimit-limit') || '0');
-    const remaining = parseInt(headers.get('x-ratelimit-remaining') || '0');
-    const reset = parseInt(headers.get('x-ratelimit-reset') || '0');
-    
+    const limit = parseInt(headers.get("x-ratelimit-limit") || "0");
+    const remaining = parseInt(headers.get("x-ratelimit-remaining") || "0");
+    const reset = parseInt(headers.get("x-ratelimit-reset") || "0");
+
     if (limit > 0) {
       this.rateLimits.set(category, { limit, remaining, reset });
     }
   }
-  
+
   // Check if we can make a request, and wait if necessary
   async acquireToken(category: string): Promise<void> {
     // Wait for any pending requests in this category
@@ -65,39 +68,39 @@ export class RateLimiter {
     if (pending) {
       await pending;
     }
-    
+
     const limits = this.rateLimits.get(category);
     if (!limits || limits.remaining > 5) {
       // We have plenty of requests remaining
       return;
     }
-    
+
     if (limits.remaining <= 5) {
       const now = Math.floor(Date.now() / 1000);
       if (limits.reset > now) {
         // Calculate wait time with 1s buffer
         const waitTime = (limits.reset - now + 1) * 1000;
-        
+
         // Create a new promise for this wait and store it
-        const waitPromise = new Promise<void>(resolve => {
+        const waitPromise = new Promise<void>((resolve) => {
           setTimeout(resolve, waitTime);
         });
-        
+
         this.queues.set(category, waitPromise);
         await waitPromise;
         this.queues.delete(category);
       }
     }
   }
-  
+
   // Handle rate limit error with exponential backoff
   async handleRateLimitError(category: string, attempt: number): Promise<void> {
     const waitTime = Math.min(Math.pow(2, attempt) * 1000, 60000); // Cap at 1 minute
-    
-    const waitPromise = new Promise<void>(resolve => {
+
+    const waitPromise = new Promise<void>((resolve) => {
       setTimeout(resolve, waitTime);
     });
-    
+
     this.queues.set(category, waitPromise);
     await waitPromise;
     this.queues.delete(category);
