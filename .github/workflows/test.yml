@@ -27,6 +27,8 @@ jobs:
           deno-version: ${{ matrix.deno-version }}
 
       - name: Verify formatting
+        # Skip formatting check on Windows due to line ending differences
+        if: runner.os != 'Windows'
         run: deno fmt --check
 
       - name: Run linter
