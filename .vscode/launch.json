@@ -18,12 +18,12 @@
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "deno",
       "runtimeArgs": [
-        "run", 
-        "--inspect-brk", 
-        "--allow-net", 
-        "--allow-env", 
-        "--allow-read", 
-        "--allow-write", 
+        "run",
+        "--inspect-brk",
+        "--allow-net",
+        "--allow-env",
+        "--allow-read",
+        "--allow-write",
         "mod.ts"
       ],
       "attachSimplePort": 9229,
@@ -36,10 +36,10 @@
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "deno",
       "runtimeArgs": [
-        "test", 
-        "--inspect-brk", 
-        "--allow-net", 
-        "--allow-env", 
+        "test",
+        "--inspect-brk",
+        "--allow-net",
+        "--allow-env",
         "--allow-read"
       ],
       "attachSimplePort": 9229,
