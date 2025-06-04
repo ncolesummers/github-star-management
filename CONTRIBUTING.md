@@ -9,6 +9,7 @@ document provides guidelines and instructions for contributing to this project.
 - [Getting Started](#getting-started)
 - [Development Environment](#development-environment)
 - [Project Structure](#project-structure)
+- [Agile Development Process](#agile-development-process)
 - [Contribution Workflow](#contribution-workflow)
 - [Commit Guidelines](#commit-guidelines)
 - [Pull Request Process](#pull-request-process)
@@ -91,6 +92,55 @@ github-star-management/
 ├── tests/              # Test files
 └── docs/               # Documentation
 ```
+
+## Agile Development Process
+
+We follow an agile development process using GitHub issues and pull requests to track work.
+
+### Issue Types
+
+We use three main types of issues to organize our work:
+
+1. **Features** - Larger units of work that deliver significant value
+2. **User Stories** - Requirements written from a user's perspective
+3. **Tasks** - Specific technical activities needed to implement features or stories
+
+Issues follow a hierarchical structure, with features containing user stories, which in turn contain tasks.
+
+### Issue Templates
+
+When creating new issues, use the appropriate template:
+
+- **Feature Request** - For proposing substantial new functionality
+- **User Story** - For capturing requirements from a user's perspective
+- **Task** - For specific technical work items
+
+See our [Issue Templates Guide](docs/guides/agile/issue-templates.md) for detailed information on using these templates effectively.
+
+### Agile Workflow
+
+Our development process follows these general steps:
+
+1. **Backlog Refinement**
+   - Features and user stories are created and refined
+   - Acceptance criteria and estimates are added
+   - Stories are prioritized
+
+2. **Sprint Planning**
+   - User stories are selected for the sprint
+   - Tasks are created for selected stories
+   - Work is assigned to team members
+
+3. **Implementation**
+   - Tasks are moved through the workflow (To Do → In Progress → Review → Done)
+   - Code is submitted via pull requests linked to tasks
+   - Tasks are marked complete when all acceptance criteria are met
+
+4. **Review**
+   - When all tasks for a user story are complete, the story is reviewed
+   - When all stories for a feature are complete, the feature is reviewed
+
+For more information on our agile processes, see the [Agile Guides](docs/guides/agile/) directory.
 
 ## Contribution Workflow
 
@@ -310,6 +360,18 @@ Before submitting your pull request, make sure to:
 - [ ] Ensure your code follows our style guidelines
 - [ ] Update documentation if necessary
 - [ ] Include relevant tests for your changes
+- [ ] Link your PR to any related issues using "Fixes #123" or "Related to #123" in the description
+
+### Linking PRs to Issues
+
+When creating a pull request, always link it to the relevant issue(s) it addresses:
+
+1. In the PR description, use keywords like "Fixes", "Resolves", or "Closes" followed by the issue number
+   Example: "Fixes #123" or "Resolves #456"
+
+2. If your PR partially addresses an issue but doesn't completely resolve it, use "Related to #123"
+
+This helps maintain traceability between issues and the code changes that address them.
 
 ## Testing
 

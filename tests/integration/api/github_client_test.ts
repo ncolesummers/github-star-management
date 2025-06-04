@@ -77,7 +77,7 @@ Deno.test({
       // Always unstar to clean up
       try {
         await client.unstarRepo(owner, repo);
-      } catch (e) {
+      } catch (_e) {
         // Ignore errors during cleanup
       }
     }

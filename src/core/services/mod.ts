@@ -5,5 +5,7 @@
  * for GitHub star management operations.
  */
 
-// This is a placeholder export that will be replaced with actual implementations
+export { BackupService } from "./backup_service.ts";
+
+// Version tracking
 export const SERVICE_VERSION = "0.1.0";

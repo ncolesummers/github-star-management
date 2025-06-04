@@ -1,0 +1,83 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run",
+      "type": "shell",
+      "command": "deno",
+      "args": ["task", "start"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": ["$deno"]
+    },
+    {
+      "label": "Dev (Watch Mode)",
+      "type": "shell",
+      "command": "deno",
+      "args": ["task", "dev"],
+      "isBackground": true,
+      "problemMatcher": ["$deno"]
+    },
+    {
+      "label": "Test",
+      "type": "shell",
+      "command": "deno",
+      "args": ["task", "test"],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": ["$deno"]
+    },
+    {
+      "label": "Lint",
+      "type": "shell",
+      "command": "deno",
+      "args": ["task", "lint"],
+      "problemMatcher": ["$deno-lint"]
+    },
+    {
+      "label": "Format",
+      "type": "shell",
+      "command": "deno",
+      "args": ["task", "fmt"],
+      "problemMatcher": ["$deno"]
+    },
+    {
+      "label": "Check Types",
+      "type": "shell",
+      "command": "deno",
+      "args": ["check", "mod.ts"],
+      "problemMatcher": ["$deno"]
+    },
+    {
+      "label": "Run with CLI Args",
+      "type": "shell",
+      "command": "deno",
+      "args": [
+        "run",
+        "--allow-net",
+        "--allow-env",
+        "--allow-read",
+        "--allow-write",
+        "mod.ts",
+        "${input:denoArgs}"
+      ],
+      "problemMatcher": ["$deno"]
+    }
+  ],
+  "inputs": [
+    {
+      "id": "denoArgs",
+      "description": "Arguments to pass to Deno script",
+      "default": "--help",
+      "type": "promptString"
+    }
+  ]
+}

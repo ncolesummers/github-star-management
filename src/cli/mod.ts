@@ -2,80 +2,52 @@
  * CLI module entry point
  */
 
-import { parse } from "@std/cli";
+// Using Cliffy until std/cli has a stable command API
+import { Command } from "https://deno.land/x/cliffy@v1.0.0-rc.3/command/mod.ts";
 import chalk from "chalk";
 import { VERSION } from "../../mod.ts";
+import { GitHubClient } from "../core/api/github_client.ts";
+import { registerBackupCommands } from "./commands/index.ts";
 
 /**
  * Main CLI entry point
  */
 export async function main(args: string[]): Promise<void> {
-  // Parse command line arguments
-  const parsedArgs = parse(args, {
-    boolean: ["help", "version", "verbose"],
-    alias: {
-      h: "help",
-      v: "version",
-      V: "verbose",
-    },
-  });
+  // Create command program
+  const program = new Command()
+    .name("star-management")
+    .version(VERSION)
+    .description("GitHub Star Management")
+    .option("--token <token:string>", "GitHub API token", {
+      default: Deno.env.get("GITHUB_TOKEN"),
+    })
+    .option("--verbose, -V", "Enable verbose output");
 
-  // Handle --help flag
-  if (parsedArgs.help) {
-    showHelp();
-    Deno.exit(0);
+  try {
+    // Setup GitHub client
+    const token = Deno.env.get("GITHUB_TOKEN") || "";
+    if (!token) {
+      console.warn(chalk.yellow(
+        "Warning: No GitHub token provided. API rate limits will be restricted.\n" +
+        "Set GITHUB_TOKEN environment variable or use --token option."
+      ));
+    }
+    
+    const githubClient = new GitHubClient({ token });
+    
+    // Register commands
+    registerBackupCommands(program, githubClient);
+    
+    // Show help if no commands
+    if (args.length === 0) {
+      program.showHelp();
+      return;
+    }
+    
+    // Parse args and execute command
+    await program.parse(args);
+  } catch (error) {
+    console.error(chalk.red(`Error: ${error.message}`));
+    Deno.exit(1);
   }
-
-  // Handle --version flag
-  if (parsedArgs.version) {
-    console.log(`GitHub Star Management v${VERSION}`);
-    Deno.exit(0);
-  }
-
-  // Get command name (first argument)
-  const command = parsedArgs._.length > 0 ? String(parsedArgs._[0]) : "";
-
-  if (!command) {
-    showHelp();
-    Deno.exit(0);
-  }
-
-  // This is a placeholder for command handling
-  // In the future, we'll implement a command registry and handlers
-  console.log(chalk.yellow(`Command '${command}' not yet implemented.`));
-  console.log("Coming soon! Check back for updates.");
-
-  Deno.exit(0);
-}
-
-/**
- * Display help information
- */
-function showHelp(): void {
-  console.log(`
-${chalk.bold("GitHub Star Management")} v${VERSION}
-
-${chalk.bold("USAGE")}
-  star-management <command> [options]
-
-${chalk.bold("COMMANDS")}
-  cleanup     Remove stars from archived or outdated repositories
-  backup      Backup all starred repositories to a file
-  restore     Restore stars from a backup file
-  categorize  Categorize stars into topical lists
-  report      Generate a star report with statistics
-  digest      Generate a digest of trending repositories
-
-${chalk.bold("GLOBAL OPTIONS")}
-  --help, -h        Show help information
-  --version, -v     Show version information
-  --verbose, -V     Enable verbose output
-
-${chalk.bold("EXAMPLES")}
-  star-management backup
-  star-management cleanup --dry-run
-  star-management report
-
-Run ${chalk.cyan("star-management <command> --help")} for command-specific help.
-`);
 }

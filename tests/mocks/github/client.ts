@@ -15,8 +15,8 @@ import type {
  * Mock GitHub client implementation for testing
  */
 export class MockGitHubClient {
-  private responses: Map<string, any> = new Map();
-  private calls: Map<string, any[][]> = new Map();
+  private responses: Map<string, unknown> = new Map();
+  private calls: Map<string, unknown[][]> = new Map();
 
   constructor() {
     // Auto-bind all methods to track calls
@@ -25,9 +25,14 @@ export class MockGitHubClient {
         MockGitHubClient.prototype,
       )
     ) {
-      if (key !== "constructor" && typeof (this as any)[key] === "function") {
-        const method = (this as any)[key];
-        (this as any)[key] = (...args: any[]) => {
+      if (
+        key !== "constructor" &&
+        typeof (this as Record<string, unknown>)[key] === "function"
+      ) {
+        const method = (this as Record<string, unknown>)[key] as (
+          ...args: unknown[]
+        ) => unknown;
+        (this as Record<string, unknown>)[key] = (...args: unknown[]) => {
           this.recordCall(key, args);
           return method.apply(this, args);
         };
@@ -38,7 +43,7 @@ export class MockGitHubClient {
   /**
    * Record a method call for later inspection
    */
-  private recordCall(method: string, args: any[]): void {
+  private recordCall(method: string, args: unknown[]): void {
     const calls = this.calls.get(method) || [];
     calls.push(args);
     this.calls.set(method, calls);
@@ -47,7 +52,7 @@ export class MockGitHubClient {
   /**
    * Add a mock response for a specific method
    */
-  addMockResponse(method: string, response: any): void {
+  addMockResponse(method: string, response: unknown): void {
     this.responses.set(method, response);
   }
 
@@ -61,7 +66,7 @@ export class MockGitHubClient {
   /**
    * Get the arguments for a specific call
    */
-  getCallArgs(method: string, index = 0): any[] | undefined {
+  getCallArgs(method: string, index = 0): unknown[] | undefined {
     return this.calls.get(method)?.[index];
   }
 
@@ -78,49 +83,61 @@ export class MockGitHubClient {
   /**
    * Get starred repositories for the current user
    */
-  async getStarredRepos(options?: RequestOptions): Promise<Repository[]> {
-    return this.responses.get("getStarredRepos") || [];
+  getStarredRepos(_options?: RequestOptions): Promise<Repository[]> {
+    return Promise.resolve(
+      this.responses.get("getStarredRepos") as Repository[] || [],
+    );
   }
 
   /**
    * Get all starred repositories (handling pagination)
    */
-  async getAllStarredRepos(options?: RequestOptions): Promise<Repository[]> {
-    return this.responses.get("getAllStarredRepos") || [];
+  getAllStarredRepos(_options?: RequestOptions): Promise<Repository[]> {
+    return Promise.resolve(
+      this.responses.get("getAllStarredRepos") as Repository[] || [],
+    );
   }
 
   /**
    * Star a repository
    */
-  async starRepo(owner: string, repo: string): Promise<void> {
+  starRepo(_owner: string, _repo: string): Promise<void> {
     // Implementation not needed, just recording the call
+    return Promise.resolve();
   }
 
   /**
    * Unstar a repository
    */
-  async unstarRepo(owner: string, repo: string): Promise<void> {
+  unstarRepo(_owner: string, _repo: string): Promise<void> {
     // Implementation not needed, just recording the call
+    return Promise.resolve();
   }
 
   /**
    * Check if a repository is starred
    */
-  async isRepoStarred(owner: string, repo: string): Promise<boolean> {
-    return this.responses.get("isRepoStarred") || false;
+  isRepoStarred(_owner: string, _repo: string): Promise<boolean> {
+    return Promise.resolve(
+      this.responses.get("isRepoStarred") as boolean || false,
+    );
   }
 
   /**
    * Get repository details
    */
-  async getRepo(owner: string, repo: string): Promise<Repository | null> {
-    return this.responses.get("getRepo") || null;
+  getRepo(_owner: string, _repo: string): Promise<Repository | null> {
+    return Promise.resolve(
+      this.responses.get("getRepo") as Repository | null || null,
+    );
   }
 
   /**
    * Get current authenticated user
    */
-  async getCurrentUser(): Promise<User | null> {
-    return this.responses.get("getCurrentUser") || null;
+  getCurrentUser(): Promise<User | null> {
+    return Promise.resolve(
+      this.responses.get("getCurrentUser") as User | null || null,
+    );
   }
 }

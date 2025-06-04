@@ -392,7 +392,10 @@ Deno.test("GitHubClient", async (t) => {
 
     // Override setTimeout to avoid waiting in tests
     const originalSetTimeout = globalThis.setTimeout;
-    globalThis.setTimeout = (callback: Function, _timeout?: number) => {
+    globalThis.setTimeout = (
+      callback: (...args: unknown[]) => void,
+      _timeout?: number,
+    ) => {
       // Call immediately instead of waiting
       callback();
       return 0 as unknown as number;

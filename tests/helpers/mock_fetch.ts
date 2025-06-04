@@ -58,7 +58,7 @@ export class MockFetch {
     this.mocks.set(key, responses);
   }
 
-  async fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+  fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
     const request = new Request(input, init);
     const url = request.url;
     const method = request.method as RequestMethod;
@@ -100,7 +100,7 @@ export class MockFetch {
     }
 
     // Create response object
-    return createResponse(response);
+    return Promise.resolve(createResponse(response));
   }
 
   get calls(): MockCall[] {

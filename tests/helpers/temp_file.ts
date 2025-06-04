@@ -13,7 +13,7 @@ export async function withTempFile(
   } finally {
     try {
       await Deno.remove(filePath);
-    } catch (e) {
+    } catch (_e) {
       // Ignore errors when removing temp files
     }
   }
@@ -29,7 +29,7 @@ export async function withTempDir(
   } finally {
     try {
       await Deno.remove(dirPath, { recursive: true });
-    } catch (e) {
+    } catch (_e) {
       // Ignore errors when removing temp dirs
     }
   }
