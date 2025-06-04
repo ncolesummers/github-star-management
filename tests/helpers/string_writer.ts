@@ -3,14 +3,18 @@
  * This helper lets us capture stdout/stderr during CLI testing
  */
 
-export class StringWriter implements Deno.Writer {
+/**
+ * StringWriter for capturing text output
+ */
+export class StringWriter {
   private chunks: Uint8Array[] = [];
 
-  async write(p: Uint8Array): Promise<number> {
+  // Implement the standard write method for Deno writers
+  write(p: Uint8Array): Promise<number> {
     const copy = new Uint8Array(p.length);
     copy.set(p);
     this.chunks.push(copy);
-    return p.length;
+    return Promise.resolve(p.length);
   }
 
   toString(): string {

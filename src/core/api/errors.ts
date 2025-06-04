@@ -65,7 +65,7 @@ export class GitHubAPIError extends Error {
  * Represents a network-level error (not an API response error)
  */
 export class NetworkError extends Error {
-  constructor(message: string, public cause?: unknown) {
+  constructor(message: string, public override cause?: unknown) {
     super(message);
     this.name = "NetworkError";
   }

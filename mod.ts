@@ -16,7 +16,9 @@ if (import.meta.main) {
   try {
     await main(Deno.args);
   } catch (error) {
-    console.error(`Error: ${error.message}`);
+    // Handle errors with proper type checking
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error(`Error: ${errorMessage}`);
     Deno.exit(1);
   }
 }

@@ -154,9 +154,19 @@ export const mockRepos = [
   },
 ];
 
+// Define the mock response type for our tests
+interface MockResponse {
+  body: unknown;
+  headers: Record<string, string>;
+  status?: number;
+}
+
 // Mock API responses for pagination testing
-export const createPaginatedRepos = (totalRepos: number, perPage = 30) => {
-  const pages: any[] = [];
+export const createPaginatedRepos = (
+  totalRepos: number,
+  perPage = 30,
+): MockResponse[] => {
+  const pages: MockResponse[] = [];
   for (let i = 0; i < Math.ceil(totalRepos / perPage); i++) {
     const pageRepos = [];
     for (let j = 0; j < Math.min(perPage, totalRepos - i * perPage); j++) {

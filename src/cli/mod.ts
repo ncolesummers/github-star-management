@@ -2,7 +2,7 @@
  * CLI module entry point
  */
 
-import { parse } from "@std/cli";
+import { parseArgs } from "@std/cli/parse-args";
 import chalk from "chalk";
 import { VERSION } from "../../mod.ts";
 
@@ -11,7 +11,7 @@ import { VERSION } from "../../mod.ts";
  */
 export async function main(args: string[]): Promise<void> {
   // Parse command line arguments
-  const parsedArgs = parse(args, {
+  const parsedArgs = parseArgs(args, {
     boolean: ["help", "version", "verbose"],
     alias: {
       h: "help",
@@ -44,6 +44,9 @@ export async function main(args: string[]): Promise<void> {
   // In the future, we'll implement a command registry and handlers
   console.log(chalk.yellow(`Command '${command}' not yet implemented.`));
   console.log("Coming soon! Check back for updates.");
+
+  // Add an awaited promise to satisfy the async requirement
+  await Promise.resolve();
 
   Deno.exit(0);
 }

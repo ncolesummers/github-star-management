@@ -117,8 +117,11 @@ export class GitHubClient {
       }
 
       // Convert other errors to NetworkError
+      const errorMessage = error instanceof Error
+        ? error.message
+        : String(error);
       throw new NetworkError(
-        `Network error while accessing ${url}: ${error.message}`,
+        `Network error while accessing ${url}: ${errorMessage}`,
         error,
       );
     }
@@ -138,7 +141,7 @@ export class GitHubClient {
       per_page: perPage.toString(),
     });
 
-    return this.request<Repository[]>(`/user/starred?${query}`);
+    return await this.request<Repository[]>(`/user/starred?${query}`);
   }
 
   /**
@@ -240,6 +243,6 @@ export class GitHubClient {
    * @returns User details
    */
   async getCurrentUser(): Promise<User> {
-    return this.request<User>("/user");
+    return await this.request<User>("/user");
   }
 }
