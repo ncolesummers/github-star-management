@@ -1,6 +1,7 @@
 # Issue Templates Guide
 
-This document explains how to use the project's issue templates within our agile development workflow.
+This document explains how to use the project's issue templates within our agile
+development workflow.
 
 ## Overview
 
@@ -8,7 +9,8 @@ We use three types of issue templates to organize our work:
 
 1. **Features** - Larger units of work that deliver significant value
 2. **User Stories** - Requirements written from a user's perspective
-3. **Tasks** - Specific technical activities needed to implement features or stories
+3. **Tasks** - Specific technical activities needed to implement features or
+   stories
 
 ## Agile Hierarchy
 
@@ -28,7 +30,8 @@ Feature
 
 ### Feature Requests
 
-Use the **Feature Request** template when proposing substantial new functionality. Features:
+Use the **Feature Request** template when proposing substantial new
+functionality. Features:
 
 - Represent significant additions to the project
 - Often span multiple user stories
@@ -36,6 +39,7 @@ Use the **Feature Request** template when proposing substantial new functionalit
 - Include clear acceptance criteria
 
 When creating a feature:
+
 1. Use the title format: `feat: [Feature Name]`
 2. Fill in all required fields, especially acceptance criteria
 3. Add appropriate labels (beyond the automatic ones)
@@ -43,7 +47,8 @@ When creating a feature:
 
 ### User Stories
 
-Use the **User Story** template to capture requirements from a user's perspective. User stories:
+Use the **User Story** template to capture requirements from a user's
+perspective. User stories:
 
 - Follow the format: "As a [role], I want [capability] so that [benefit]"
 - Are estimated using story points (1, 2, 3, 5, 8, 13)
@@ -52,10 +57,12 @@ Use the **User Story** template to capture requirements from a user's perspectiv
 - Link to their parent feature
 
 When creating a user story:
+
 1. Use the title format provided in the template
 2. Ensure the story is properly sized
 3. Check that all acceptance criteria are testable
-4. Link to the parent feature using `Relates to #[feature-number]` in the description
+4. Link to the parent feature using `Relates to #[feature-number]` in the
+   description
 
 ### Tasks
 
@@ -68,6 +75,7 @@ Use the **Task** template for specific technical work items. Tasks:
 - Link to their parent user story
 
 When creating a task:
+
 1. Use the title format: `task: [Brief Task Description]`
 2. Link to the parent user story
 3. Provide detailed technical information
@@ -122,6 +130,7 @@ We use the following labels to organize our issues:
 ## Further Reading
 
 For more information on our agile processes, see:
+
 - [Agile Workflow Guide](./workflow.md)
 - [Sprint Planning Guide](./sprint-planning.md)
 - [Definition of Done](./definition-of-done.md)

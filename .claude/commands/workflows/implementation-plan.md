@@ -1,7 +1,7 @@
 # Implementation Plan Workflow
 
-This workflow creates a detailed implementation plan for a feature, recommending specific
-roles and workflows to use for each component of the work.
+This workflow creates a detailed implementation plan for a feature, recommending
+specific roles and workflows to use for each component of the work.
 
 ## Workflow Steps
 
@@ -54,21 +54,29 @@ roles and workflows to use for each component of the work.
 
 ## Available Roles
 
-The project includes the following specialized roles that can be used in your implementation plan:
+The project includes the following specialized roles that can be used in your
+implementation plan:
 
-- `/project:roles:product-owner` - Defines features and user stories with business value
-- `/project:roles:scrum-master` - Facilitates agile processes and removes impediments
+- `/project:roles:product-owner` - Defines features and user stories with
+  business value
+- `/project:roles:scrum-master` - Facilitates agile processes and removes
+  impediments
 - `/project:roles:development-team` - Implements features with Deno TypeScript
 - `/project:roles:deno-api-specialist` - Expertise in Deno APIs and patterns
-- `/project:roles:deno-github-api-specialist` - Specializes in GitHub API integration
+- `/project:roles:deno-github-api-specialist` - Specializes in GitHub API
+  integration
 - `/project:roles:deno-testing-specialist` - Expert in testing Deno applications
 - `/project:roles:cli-specialist` - Specializes in command-line interfaces
-- `/project:roles:star-management-cli-specialist` - Expert in star management CLI
-- `/project:roles:star-management-specialist` - Deep knowledge of star management domain
+- `/project:roles:star-management-cli-specialist` - Expert in star management
+  CLI
+- `/project:roles:star-management-specialist` - Deep knowledge of star
+  management domain
 - `/project:roles:test-driven-development-specialist` - TDD expertise
 - `/project:roles:devops-specialist` - Deployment and automation expert
-- `/project:roles:open-source-maintainer` - Expert in open source project maintenance
-- `/project:roles:research-assistant` - Assists with research and documentation. Great for performing spike research tasks.
+- `/project:roles:open-source-maintainer` - Expert in open source project
+  maintenance
+- `/project:roles:research-assistant` - Assists with research and documentation.
+  Great for performing spike research tasks.
 
 ## Available Workflows
 
@@ -90,8 +98,8 @@ The project includes these workflows to assist with implementation:
 
 ## Feature Overview
 
-Automatically categorize GitHub stars based on repository metadata including topics,
-description, and README content.
+Automatically categorize GitHub stars based on repository metadata including
+topics, description, and README content.
 
 ## Related Issues
 
@@ -118,28 +126,32 @@ description, and README content.
 
 - Role: `/project:roles:deno-github-api-specialist`
 - Workflow: `/project:workflows:test-first-api-client`
-- Command Arguments: "Implement GitHub repository topic fetching with pagination and rate limiting"
+- Command Arguments: "Implement GitHub repository topic fetching with pagination
+  and rate limiting"
 - Expected Outcome: API client methods for fetching repository topics with tests
 
 ### Step 2: Create Categorization Service
 
 - Role: `/project:roles:star-management-specialist`
 - Workflow: `/project:workflows:test-driven-feature`
-- Command Arguments: "Create a service that maps GitHub topics to predefined categories with confidence scores"
+- Command Arguments: "Create a service that maps GitHub topics to predefined
+  categories with confidence scores"
 - Expected Outcome: Categorization service with algorithms and tests
 
 ### Step 3: Implement CLI Command
 
 - Role: `/project:roles:star-management-cli-specialist`
 - Workflow: `/project:workflows:add-cli-command`
-- Command Arguments: "Add categorize command with options for output format and filtering"
+- Command Arguments: "Add categorize command with options for output format and
+  filtering"
 - Expected Outcome: CLI command for categorization with documentation
 
 ### Step 4: Add Integration Tests
 
 - Role: `/project:roles:deno-testing-specialist`
 - Workflow: `/project:workflows:implement-tests`
-- Command Arguments: "Create integration tests for the complete categorization workflow"
+- Command Arguments: "Create integration tests for the complete categorization
+  workflow"
 - Expected Outcome: Integration tests verifying end-to-end functionality
 
 ### Step 5: Update Documentation

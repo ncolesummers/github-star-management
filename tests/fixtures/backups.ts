@@ -65,7 +65,7 @@ export function createMockBackup(
   const now = new Date().toISOString();
   const id = options.id || `backup-${now.split("T")[0]}`;
   const repos = options.repositories || mockRepos.slice(0, 3);
-  
+
   return {
     meta: {
       id,
@@ -80,7 +80,9 @@ export function createMockBackup(
 }
 
 // Sample backup keys for KV store
-export const mockBackupKeys = mockBackupMetas.map((meta) => ["backups", meta.id]);
+export const mockBackupKeys = mockBackupMetas.map((
+  meta,
+) => ["backups", meta.id]);
 
 // Sample JSON backup file content
 export const mockBackupFileContent = JSON.stringify(mockBackups[0], null, 2);

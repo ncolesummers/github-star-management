@@ -1,7 +1,8 @@
 # Feature Refinement Workflow
 
-This workflow guides you through breaking down a feature into user stories and tasks
-using agile methodologies, following the GitHub Star Management project's issue templates.
+This workflow guides you through breaking down a feature into user stories and
+tasks using agile methodologies, following the GitHub Star Management project's
+issue templates.
 
 ## Workflow Steps
 
@@ -50,22 +51,27 @@ using agile methodologies, following the GitHub Star Management project's issue 
 # Feature: Automated Star Categorization
 
 ## Feature Description
-Automatically categorize GitHub stars based on repository metadata including topics, 
-description, and README content.
+
+Automatically categorize GitHub stars based on repository metadata including
+topics, description, and README content.
 
 ## Problem Statement
-Users with many starred repositories struggle to find relevant projects when needed.
-Manual categorization is time-consuming and prone to inconsistency.
+
+Users with many starred repositories struggle to find relevant projects when
+needed. Manual categorization is time-consuming and prone to inconsistency.
 
 ## Proposed Solution
-Implement an automated system that analyzes repository metadata and assigns categories
-based on configurable rules and machine learning techniques.
+
+Implement an automated system that analyzes repository metadata and assigns
+categories based on configurable rules and machine learning techniques.
 
 ## User Benefit
-Users can quickly find relevant starred repositories organized by meaningful categories
-without manual effort.
+
+Users can quickly find relevant starred repositories organized by meaningful
+categories without manual effort.
 
 ## Acceptance Criteria
+
 - [ ] System can categorize repositories based on GitHub topics
 - [ ] System can analyze repository descriptions for categorization
 - [ ] System can extract relevant information from README files
@@ -79,10 +85,12 @@ without manual effort.
 
 ```markdown
 ## User Story: Topic-Based Categorization
-As a GitHub user, I want my starred repositories to be automatically categorized 
+
+As a GitHub user, I want my starred repositories to be automatically categorized
 based on their GitHub topics so that I can find relevant projects quickly.
 
 ### Acceptance Criteria
+
 - [ ] System fetches topics for each starred repository
 - [ ] System maps GitHub topics to pre-defined categories
 - [ ] Repositories can belong to multiple categories
@@ -98,15 +106,18 @@ based on their GitHub topics so that I can find relevant projects quickly.
 ## Task: Implement Topic Fetching
 
 ### Task Description
+
 Create a service to fetch topics for starred repositories using the GitHub API.
 
 ### Technical Details
+
 - Use the GitHub API endpoint: GET /repos/{owner}/{repo}/topics
 - Handle pagination for users with many stars
 - Implement rate limiting protection
 - Cache results to avoid redundant API calls
 
 ### Implementation Steps
+
 1. Add TopicService class in src/core/services/
 2. Implement topic fetching with pagination support
 3. Add caching mechanism with configurable TTL
@@ -114,6 +125,7 @@ Create a service to fetch topics for starred repositories using the GitHub API.
 5. Create unit tests with mock responses
 
 ### Acceptance Criteria
+
 - [ ] Successfully retrieves topics for all starred repositories
 - [ ] Properly handles GitHub API rate limits
 - [ ] Includes test coverage for success and error cases

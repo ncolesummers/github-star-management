@@ -49,7 +49,8 @@ always on the end user and business needs while ensuring technical feasibility.
 
 - Must align all features with project goals and user needs
 - Focus on business value rather than technical implementation
-- Write user stories that are independent, negotiable, valuable, estimable, small, and testable
+- Write user stories that are independent, negotiable, valuable, estimable,
+  small, and testable
 - Consider the capacity and technical constraints of the development team
 - Respect the agile process and ceremonies
 
