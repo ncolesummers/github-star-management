@@ -29,25 +29,27 @@ export async function main(args: string[]): Promise<void> {
     if (!token) {
       console.warn(chalk.yellow(
         "Warning: No GitHub token provided. API rate limits will be restricted.\n" +
-        "Set GITHUB_TOKEN environment variable or use --token option."
+          "Set GITHUB_TOKEN environment variable or use --token option.",
       ));
     }
-    
+
     const githubClient = new GitHubClient({ token });
-    
+
     // Register commands
+    // @ts-ignore - Type compatibility is handled within the function
     registerBackupCommands(program, githubClient);
-    
+
     // Show help if no commands
     if (args.length === 0) {
       program.showHelp();
       return;
     }
-    
+
     // Parse args and execute command
     await program.parse(args);
   } catch (error) {
-    console.error(chalk.red(`Error: ${error.message}`));
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error(chalk.red(`Error: ${errorMessage}`));
     Deno.exit(1);
   }
 }

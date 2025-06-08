@@ -1,54 +1,90 @@
 /**
  * Mock implementation of Deno.Kv for testing
- * 
+ *
  * This module provides a mock implementation of the Deno.Kv API
  * that can be used in tests without requiring actual KV storage.
  */
 
-// Define types for KV operations based on Deno.Kv
-type KvKey = unknown[];
-type KvEntry<T> = {
+// Define KV types for our mock implementation
+type KvKey = Deno.KvKey;
+
+// Define our own versions of the KV types to avoid compatibility issues
+interface KvEntry<T> {
   key: KvKey;
   value: T;
   versionstamp: string;
-};
+}
 
-type KvListSelector = {
-  prefix: unknown[];
-  start?: unknown[];
-  end?: unknown[];
+// Entry that might have null values for not found entries
+interface KvEntryMaybe<T> {
+  key: KvKey;
+  value: T | null;
+  versionstamp: string | null;
+}
+
+interface KvListSelector {
+  prefix: KvKey;
+  start?: KvKey;
+  end?: KvKey;
   limit?: number;
   reverse?: boolean;
   cursor?: string;
-};
+}
 
-type KvListIterator<T> = AsyncIterableIterator<KvEntry<T>> & {
+interface KvListOptions {
+  consistency?: "strong" | "eventual";
+  batchSize?: number;
+}
+
+interface KvListIterator<T> extends AsyncIterableIterator<KvEntry<T>> {
   cursor: string;
-};
+}
+
+interface KvCommitResult {
+  ok: true;
+  versionstamp: string;
+}
+
+interface KvCommitError {
+  ok: false;
+  versionstamp: null;
+}
+
+type KvCommitResponse = KvCommitResult | KvCommitError;
 
 type AtomicOperation = {
-  check: { key: KvKey; versionstamp: string | null; };
+  check: { key: KvKey; versionstamp: string | null };
 } | {
-  set: { key: KvKey; value: unknown; expireIn?: number; };
+  set: { key: KvKey; value: unknown; expireIn?: number };
 } | {
-  delete: { key: KvKey; };
+  delete: { key: KvKey };
 };
 
 /**
- * Type declaration to use for our mock implementation
- * This allows us to implement just the parts we need for testing
+ * Type declaration for our mock implementation
+ * Implementing the necessary parts of Deno.Kv
  */
 interface PartialKv {
-  get<T = unknown>(key: unknown[]): Promise<{ key: unknown[]; value: T; versionstamp: string }>;
-  getMany<T extends unknown[]>(keys: unknown[][]): Promise<{ [K in keyof T]: { key: unknown[]; value: T[K]; versionstamp: string } }>;
-  set(key: unknown[], value: unknown): Promise<{ ok: true; versionstamp: string }>;
-  delete(key: unknown[]): Promise<void>;
-  list<T = unknown>(selector: { prefix: unknown[] }): AsyncIterableIterator<{ key: unknown[]; value: T; versionstamp: string }> & { cursor: string };
-  atomic(): { 
-    commit(): Promise<{ ok: boolean; versionstamp: string | null }>;
-    check(key: unknown[], versionstamp: string | null): unknown;
-    set(key: unknown[], value: unknown): unknown;
-    delete(key: unknown[]): unknown;
+  get<T = unknown>(key: KvKey, options?: unknown): Promise<KvEntryMaybe<T>>;
+  getMany<T extends unknown[]>(
+    keys: KvKey[],
+    options?: unknown,
+  ): Promise<{ [K in keyof T]: KvEntryMaybe<T[K]> }>;
+  set(
+    key: KvKey,
+    value: unknown,
+    options?: unknown,
+  ): Promise<{ ok: true; versionstamp: string }>;
+  delete(key: KvKey, options?: unknown): Promise<void>;
+  list<T = unknown>(
+    selector: KvListSelector,
+    options?: KvListOptions,
+  ): KvListIterator<T>;
+  atomic(): {
+    commit(): Promise<KvCommitResponse>;
+    check(key: KvKey, versionstamp: string | null): unknown;
+    set(key: KvKey, value: unknown, options?: unknown): unknown;
+    delete(key: KvKey): unknown;
   };
   close(): void;
 }
@@ -81,7 +117,7 @@ export class MockKv implements PartialKv {
   /**
    * Check if a key matches a prefix
    */
-  private keyMatchesPrefix(key: KvKey, prefix: unknown[]): boolean {
+  private keyMatchesPrefix(key: KvKey, prefix: KvKey): boolean {
     if (key.length < prefix.length) {
       return false;
     }
@@ -100,33 +136,33 @@ export class MockKv implements PartialKv {
    */
   private compareKeys(a: KvKey, b: KvKey): number {
     const minLength = Math.min(a.length, b.length);
-    
+
     for (let i = 0; i < minLength; i++) {
       const aStr = JSON.stringify(a[i]);
       const bStr = JSON.stringify(b[i]);
-      
+
       if (aStr < bStr) return -1;
       if (aStr > bStr) return 1;
     }
-    
+
     return a.length - b.length;
   }
 
   /**
    * Get a value from the KV store
    */
-  get<T = unknown>(key: KvKey): Promise<KvEntry<T>> {
+  get<T = unknown>(key: KvKey, _options?: unknown): Promise<KvEntryMaybe<T>> {
     const keyStr = this.keyToString(key);
     const entry = this.data.get(keyStr);
-    
+
     if (!entry) {
       return Promise.resolve({
         key,
-        value: null as unknown as T,
-        versionstamp: null as unknown as string,
+        value: null,
+        versionstamp: null,
       });
     }
-    
+
     return Promise.resolve({
       key,
       value: entry.value as T,
@@ -139,27 +175,34 @@ export class MockKv implements PartialKv {
    */
   async getMany<T extends unknown[]>(
     keys: KvKey[],
-  ): Promise<{ [K in keyof T]: KvEntry<T[K]> }> {
-    const results = await Promise.all(keys.map((key) => this.get(key)));
-    return results as { [K in keyof T]: KvEntry<T[K]> };
+    options?: unknown,
+  ): Promise<{ [K in keyof T]: KvEntryMaybe<T[K]> }> {
+    const results = await Promise.all(
+      keys.map((key) => this.get(key, options)),
+    );
+    return results as { [K in keyof T]: KvEntryMaybe<T[K]> };
   }
 
   /**
    * Set a value in the KV store
    */
-  set(key: KvKey, value: unknown): Promise<{ ok: true; versionstamp: string }> {
+  set(
+    key: KvKey,
+    value: unknown,
+    _options?: unknown,
+  ): Promise<{ ok: true; versionstamp: string }> {
     const keyStr = this.keyToString(key);
     const versionstamp = this.generateVersionstamp();
-    
+
     this.data.set(keyStr, { value, versionstamp });
-    
+
     return Promise.resolve({ ok: true, versionstamp });
   }
 
   /**
    * Delete a value from the KV store
    */
-  delete(key: KvKey): Promise<void> {
+  delete(key: KvKey, _options?: unknown): Promise<void> {
     const keyStr = this.keyToString(key);
     this.data.delete(keyStr);
     return Promise.resolve();
@@ -168,15 +211,19 @@ export class MockKv implements PartialKv {
   /**
    * List values in the KV store
    */
-  list<T = unknown>(selector: KvListSelector): KvListIterator<T> {
-    const { prefix, limit = Number.MAX_SAFE_INTEGER, reverse = false } = selector;
-    
+  list<T = unknown>(
+    selector: KvListSelector,
+    _options?: KvListOptions,
+  ): KvListIterator<T> {
+    const { prefix, limit = Number.MAX_SAFE_INTEGER, reverse = false } =
+      selector;
+
     // Find all matching keys
     const matchingEntries: KvEntry<T>[] = [];
-    
+
     for (const [keyStr, entry] of this.data.entries()) {
       const key = JSON.parse(keyStr) as KvKey;
-      
+
       if (this.keyMatchesPrefix(key, prefix)) {
         matchingEntries.push({
           key,
@@ -185,98 +232,93 @@ export class MockKv implements PartialKv {
         });
       }
     }
-    
+
     // Sort entries
     matchingEntries.sort((a, b) => {
       const comparison = this.compareKeys(a.key, b.key);
       return reverse ? -comparison : comparison;
     });
-    
+
     // Create a copy of the entries for the iterator to use
     // This prevents modifications to the original array during iteration
     const entries = [...matchingEntries].slice(0, limit);
-    
+
     // Create iterator
     const iterator: KvListIterator<T> = {
       cursor: "", // Mock implementation doesn't need real cursors
-      
+
       async *[Symbol.asyncIterator]() {
         for (const entry of entries) {
           yield entry;
         }
       },
-      
+
       next(): Promise<IteratorResult<KvEntry<T>>> {
         if (entries.length === 0) {
           return Promise.resolve({ done: true, value: undefined });
         }
-        
+
         const value = entries.shift()!;
         return Promise.resolve({ done: false, value });
       },
     };
-    
+
     return iterator;
   }
 
   /**
    * Create an atomic operation
    */
-  atomic(): { 
-    commit(): Promise<{ ok: boolean; versionstamp: string | null }>;
-    check(key: KvKey, versionstamp: string | null): unknown;
-    set(key: KvKey, value: unknown): unknown;
-    delete(key: KvKey): unknown;
-  } {
+  atomic() {
     const operations: AtomicOperation[] = [];
-    
+
     const atomic = {
       check: (key: KvKey, versionstamp: string | null) => {
         operations.push({ check: { key, versionstamp } });
         return atomic;
       },
-      
-      set: (key: KvKey, value: unknown) => {
+
+      set: (key: KvKey, value: unknown, _options?: unknown) => {
         operations.push({ set: { key, value } });
         return atomic;
       },
-      
+
       delete: (key: KvKey) => {
         operations.push({ delete: { key } });
         return atomic;
       },
-      
-      commit: async () => {
+
+      commit: async (): Promise<KvCommitResponse> => {
         // Check operations
         for (const op of operations) {
-          if ('check' in op) {
+          if ("check" in op) {
             const { key, versionstamp } = op.check;
             const entry = await this.get(key);
-            
+
             if (entry.versionstamp !== versionstamp) {
               return { ok: false, versionstamp: null };
             }
           }
         }
-        
+
         // Apply operations
         let finalVersionstamp: string | null = null;
-        
+
         for (const op of operations) {
-          if ('set' in op) {
+          if ("set" in op) {
             const { key, value } = op.set;
             const result = await this.set(key, value);
             finalVersionstamp = result.versionstamp;
-          } else if ('delete' in op) {
+          } else if ("delete" in op) {
             const { key } = op.delete;
             await this.delete(key);
           }
         }
-        
-        return { ok: true, versionstamp: finalVersionstamp };
+
+        return { ok: true, versionstamp: finalVersionstamp || "" };
       },
     };
-    
+
     return atomic;
   }
 

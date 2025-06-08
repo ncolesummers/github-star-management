@@ -1,6 +1,6 @@
 /**
  * Backup command implementation
- * 
+ *
  * CLI commands for managing GitHub star backups
  */
 
@@ -21,7 +21,7 @@ function formatDate(dateStr: string): string {
 
 /**
  * Register backup commands
- * 
+ *
  * @param program Command program instance
  * @param githubClient GitHub client
  */
@@ -50,7 +50,10 @@ export function registerBackupCommands(
     .description("Create a new backup of starred repositories")
     .option("--description <text:string>", "Description for the backup")
     .option("--tags <tags:string>", "Comma-separated list of tags")
-    .option("--overwrite", "Overwrite most recent backup instead of creating new one")
+    .option(
+      "--overwrite",
+      "Overwrite most recent backup instead of creating new one",
+    )
     .action(async (options) => {
       try {
         // Initialize KV and service
@@ -60,7 +63,7 @@ export function registerBackupCommands(
         console.log(chalk.cyan("Creating backup of starred repositories..."));
 
         // Process tags if provided
-        const tags = options.tags 
+        const tags = options.tags
           ? options.tags.split(",").map((tag: string) => tag.trim())
           : undefined;
 
@@ -71,13 +74,17 @@ export function registerBackupCommands(
           overwrite: options.overwrite,
         });
 
-        console.log(chalk.green(`✅ Backup created successfully with ID: ${meta.id}`));
-        console.log(`Backed up ${meta.count} repositories for user ${meta.username}`);
-        
+        console.log(
+          chalk.green(`✅ Backup created successfully with ID: ${meta.id}`),
+        );
+        console.log(
+          `Backed up ${meta.count} repositories for user ${meta.username}`,
+        );
+
         if (meta.description) {
           console.log(`Description: ${meta.description}`);
         }
-        
+
         if (meta.tags && meta.tags.length > 0) {
           console.log(`Tags: ${meta.tags.join(", ")}`);
         }
@@ -85,7 +92,9 @@ export function registerBackupCommands(
         // Close KV
         kv.close();
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage = error instanceof Error
+          ? error.message
+          : String(error);
         console.error(chalk.red(`Error creating backup: ${errorMessage}`));
         Deno.exit(1);
       }
@@ -118,7 +127,7 @@ export function registerBackupCommands(
           // Create a table
           const table = new Table();
           table.push(["ID", "Created", "User", "Count", "Description", "Tags"]);
-          
+
           for (const backup of backups) {
             table.push([
               backup.id,
@@ -129,7 +138,7 @@ export function registerBackupCommands(
               backup.tags?.join(", ") || "",
             ]);
           }
-          
+
           console.log(table.toString());
           console.log(`\nTotal: ${backups.length} backup(s)`);
         }
@@ -137,7 +146,9 @@ export function registerBackupCommands(
         // Close KV
         kv.close();
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage = error instanceof Error
+          ? error.message
+          : String(error);
         console.error(chalk.red(`Error listing backups: ${errorMessage}`));
         Deno.exit(1);
       }
@@ -172,19 +183,19 @@ export function registerBackupCommands(
           console.log(`Created: ${formatDate(backup.meta.createdAt)}`);
           console.log(`User: ${backup.meta.username}`);
           console.log(`Repositories: ${backup.meta.count}`);
-          
+
           if (backup.meta.description) {
             console.log(`Description: ${backup.meta.description}`);
           }
-          
+
           if (backup.meta.tags && backup.meta.tags.length > 0) {
             console.log(`Tags: ${backup.meta.tags.join(", ")}`);
           }
-          
+
           console.log("\nRepositories:");
           const table = new Table();
           table.push(["Name", "Owner", "Language", "Stars", "Updated"]);
-          
+
           for (const repo of backup.repositories) {
             table.push([
               repo.name,
@@ -194,14 +205,16 @@ export function registerBackupCommands(
               new Date(repo.updated_at).toLocaleDateString(),
             ]);
           }
-          
+
           console.log(table.toString());
         }
 
         // Close KV
         kv.close();
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage = error instanceof Error
+          ? error.message
+          : String(error);
         console.error(chalk.red(`Error getting backup: ${errorMessage}`));
         Deno.exit(1);
       }
@@ -230,9 +243,9 @@ export function registerBackupCommands(
         // Confirm deletion unless --force is used
         if (!options.force) {
           const confirmation = prompt(
-            `Are you sure you want to delete backup '${options.id}'? (y/N) `
+            `Are you sure you want to delete backup '${options.id}'? (y/N) `,
           );
-          
+
           if (confirmation?.toLowerCase() !== "y") {
             console.log("Deletion cancelled.");
             kv.close();
@@ -242,12 +255,16 @@ export function registerBackupCommands(
 
         // Delete the backup
         await backupService.deleteBackup(options.id);
-        console.log(chalk.green(`✅ Backup '${options.id}' deleted successfully.`));
+        console.log(
+          chalk.green(`✅ Backup '${options.id}' deleted successfully.`),
+        );
 
         // Close KV
         kv.close();
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage = error instanceof Error
+          ? error.message
+          : String(error);
         console.error(chalk.red(`Error deleting backup: ${errorMessage}`));
         Deno.exit(1);
       }
@@ -278,9 +295,9 @@ export function registerBackupCommands(
           const stat = await Deno.stat(options.output);
           if (stat.isFile) {
             const confirmation = prompt(
-              `File '${options.output}' already exists. Overwrite? (y/N) `
+              `File '${options.output}' already exists. Overwrite? (y/N) `,
             );
-            
+
             if (confirmation?.toLowerCase() !== "y") {
               console.log("Export cancelled.");
               kv.close();
@@ -293,12 +310,18 @@ export function registerBackupCommands(
 
         // Export the backup
         await backupService.exportBackup(options.id, options.output);
-        console.log(chalk.green(`✅ Backup exported successfully to '${options.output}'.`));
+        console.log(
+          chalk.green(
+            `✅ Backup exported successfully to '${options.output}'.`,
+          ),
+        );
 
         // Close KV
         kv.close();
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage = error instanceof Error
+          ? error.message
+          : String(error);
         console.error(chalk.red(`Error exporting backup: ${errorMessage}`));
         Deno.exit(1);
       }
@@ -309,7 +332,10 @@ export function registerBackupCommands(
     .command("import")
     .description("Import a backup from a file")
     .option("--input <file:string>", "Input file path", { required: true })
-    .option("--description <text:string>", "New description for the imported backup")
+    .option(
+      "--description <text:string>",
+      "New description for the imported backup",
+    )
     .option("--tags <tags:string>", "Comma-separated list of tags")
     .option("--overwrite", "Overwrite if backup with same ID exists")
     .action(async (options) => {
@@ -319,26 +345,30 @@ export function registerBackupCommands(
         const backupService = new BackupService(kv, githubClient);
 
         // Process tags if provided
-        const tags = options.tags 
+        const tags = options.tags
           ? options.tags.split(",").map((tag: string) => tag.trim())
           : undefined;
 
         // Import the backup
         console.log(chalk.cyan(`Importing backup from '${options.input}'...`));
-        
+
         const meta = await backupService.importBackup(options.input, {
           description: options.description,
           tags,
           overwrite: options.overwrite,
         });
 
-        console.log(chalk.green(`✅ Backup imported successfully with ID: ${meta.id}`));
-        console.log(`Imported ${meta.count} repositories for user ${meta.username}`);
-        
+        console.log(
+          chalk.green(`✅ Backup imported successfully with ID: ${meta.id}`),
+        );
+        console.log(
+          `Imported ${meta.count} repositories for user ${meta.username}`,
+        );
+
         if (meta.description) {
           console.log(`Description: ${meta.description}`);
         }
-        
+
         if (meta.tags && meta.tags.length > 0) {
           console.log(`Tags: ${meta.tags.join(", ")}`);
         }
@@ -346,12 +376,14 @@ export function registerBackupCommands(
         // Close KV
         kv.close();
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage = error instanceof Error
+          ? error.message
+          : String(error);
         console.error(chalk.red(`Error importing backup: ${errorMessage}`));
         Deno.exit(1);
       }
     });
 
   // Add the backup command to the program
-  program.addCommand(backupCommand as unknown as string);
+  program.command(backupCommand as unknown as string);
 }

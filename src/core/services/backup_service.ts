@@ -1,10 +1,15 @@
 /**
  * BackupService implementation
- * 
+ *
  * Service for managing GitHub star backups using Deno KV
  */
 
-import { Backup, BackupMeta, BackupOptions, BackupService as IBackupService } from "../models/backup.ts";
+import {
+  Backup,
+  BackupMeta,
+  BackupOptions,
+  BackupService as IBackupService,
+} from "../models/backup.ts";
 import { GitHubClient } from "../api/github_client.ts";
 
 /**
@@ -12,25 +17,35 @@ import { GitHubClient } from "../api/github_client.ts";
  */
 /**
  * Interface for KV storage to allow for testing with mocks
- * Matches Deno's Kv API structure
+ * Compatible with Deno's Kv API structure
  */
-// Deno KV key part types: string | number | boolean | Uint8Array
-type KvKeyPart = string | number | boolean | Uint8Array;
-type KvKey = KvKeyPart[];
+// Define the KvKey type for our implementation
+type KvKey = Deno.KvKey;
 
+// Define KvStore interface compatible with both real Deno.Kv and our mock
 interface KvStore {
-  get<T = unknown>(key: KvKey, options?: { consistency?: unknown }): Promise<{ 
-    key: KvKey; 
-    value: T | null; 
-    versionstamp: string | null 
+  get<T = unknown>(key: KvKey, options?: unknown): Promise<{
+    key: KvKey;
+    value: T | null;
+    versionstamp: string | null;
   }>;
-  set(key: KvKey, value: unknown): Promise<{ ok: true; versionstamp: string }>;
-  delete(key: KvKey): Promise<void>;
-  list<T = unknown>(selector: { prefix: KvKey }): AsyncIterableIterator<{ 
-    key: KvKey; 
-    value: T; 
-    versionstamp: string 
-  }>;
+  set(
+    key: KvKey,
+    value: unknown,
+    options?: unknown,
+  ): Promise<{ ok: true; versionstamp: string }>;
+  delete(key: KvKey, options?: unknown): Promise<void>;
+  list<T = unknown>(
+    selector: { prefix: KvKey },
+    options?: unknown,
+  ):
+    & AsyncIterableIterator<{
+      key: KvKey;
+      value: T;
+      versionstamp: string;
+    }>
+    & { cursor: string };
+  close(): void;
 }
 
 export class BackupService implements IBackupService {
@@ -39,7 +54,7 @@ export class BackupService implements IBackupService {
 
   /**
    * Create a new BackupService
-   * 
+   *
    * @param kv KV store instance
    * @param githubClient GitHub API client
    */
@@ -50,7 +65,7 @@ export class BackupService implements IBackupService {
 
   /**
    * Create a new backup of starred repositories
-   * 
+   *
    * @param options Backup options
    * @returns Backup metadata
    */
@@ -92,16 +107,16 @@ export class BackupService implements IBackupService {
 
   /**
    * List all available backups
-   * 
+   *
    * @returns List of backup metadata
    */
   async listBackups(): Promise<BackupMeta[]> {
     const backups: BackupMeta[] = [];
-    
+
     // Query KV for backup metadata - specifically looking for metadata entries
     for await (const entry of this.kv.list({ prefix: ["backups"] })) {
       const key = entry.key;
-      
+
       // Only process metadata entries
       if (key.length === 3 && key[2] === "meta") {
         // Ensure we have a valid BackupMeta object
@@ -111,7 +126,7 @@ export class BackupService implements IBackupService {
         }
       }
     }
-    
+
     // Sort by creation date (newest first)
     return backups.sort((a, b) => {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
@@ -120,7 +135,7 @@ export class BackupService implements IBackupService {
 
   /**
    * Get a specific backup by ID
-   * 
+   *
    * @param id Backup ID
    * @returns Backup or null if not found
    */
@@ -131,7 +146,7 @@ export class BackupService implements IBackupService {
 
   /**
    * Delete a backup by ID
-   * 
+   *
    * @param id Backup ID
    * @returns True if deleted, false if not found
    */
@@ -141,17 +156,17 @@ export class BackupService implements IBackupService {
     if (!backup) {
       return false;
     }
-    
+
     // Delete both metadata and data
     await this.kv.delete(["backups", id, "meta"]);
     await this.kv.delete(["backups", id, "data"]);
-    
+
     return true;
   }
 
   /**
    * Export a backup to a file
-   * 
+   *
    * @param id Backup ID
    * @param filePath File path to export to
    */
@@ -160,7 +175,7 @@ export class BackupService implements IBackupService {
     if (!backup) {
       throw new Error("Backup not found");
     }
-    
+
     // Write to file
     const json = JSON.stringify(backup, null, 2);
     await Deno.writeTextFile(filePath, json);
@@ -168,44 +183,49 @@ export class BackupService implements IBackupService {
 
   /**
    * Import a backup from a file
-   * 
+   *
    * @param filePath File path to import from
    * @param options Import options
    * @returns Backup metadata
    */
-  async importBackup(filePath: string, options: BackupOptions = {}): Promise<BackupMeta> {
+  async importBackup(
+    filePath: string,
+    options: BackupOptions = {},
+  ): Promise<BackupMeta> {
     // Read and parse file
     const json = await Deno.readTextFile(filePath);
     const backup = JSON.parse(json) as Backup;
-    
+
     // If options specify overwrite, use the original ID, otherwise generate a new one
     if (!options.overwrite) {
       const today = new Date().toISOString().split("T")[0];
-      backup.meta.id = `backup-${today}-imported-${Date.now().toString().slice(-6)}`;
+      backup.meta.id = `backup-${today}-imported-${
+        Date.now().toString().slice(-6)
+      }`;
     }
-    
+
     // Update metadata if options are provided
     if (options.description !== undefined) {
       backup.meta.description = options.description;
     }
-    
+
     if (options.tags !== undefined) {
       backup.meta.tags = options.tags;
     }
-    
+
     // Update timestamp to current time
     backup.meta.createdAt = new Date().toISOString();
-    
+
     // Store in KV
     await this.kv.set(["backups", backup.meta.id, "meta"], backup.meta);
     await this.kv.set(["backups", backup.meta.id, "data"], backup);
-    
+
     return backup.meta;
   }
 
   /**
    * Get the ID of the most recent backup
-   * 
+   *
    * @returns Most recent backup ID or null if none exist
    */
   private async getLatestBackupId(): Promise<string | null> {
