@@ -8,7 +8,7 @@
 import {
   assertEquals,
   assertStringIncludes,
-} from "https://deno.land/std/assert/mod.ts";
+} from "@std/assert";
 import { StringWriter } from "../../helpers/string_writer.ts";
 import { withTempFile } from "../../helpers/temp_file.ts";
 

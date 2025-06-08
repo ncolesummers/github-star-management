@@ -6,7 +6,7 @@ import {
   assertEquals,
   assertExists,
   assertRejects,
-} from "https://deno.land/std/testing/asserts.ts";
+} from "@std/assert";
 import { openMockKv } from "../../helpers/mock_kv.ts";
 import { BackupService } from "../../../src/core/services/backup_service.ts";
 import { Backup } from "../../../src/core/models/backup.ts";

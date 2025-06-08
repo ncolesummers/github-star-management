@@ -8,7 +8,7 @@
 import {
   assertEquals,
   assertExists,
-} from "https://deno.land/std/assert/mod.ts";
+} from "@std/assert";
 import { GitHubClient } from "../../../src/core/api/mod.ts";
 
 // Only run integration tests when explicitly enabled

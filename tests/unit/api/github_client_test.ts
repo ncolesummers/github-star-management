@@ -2,11 +2,11 @@
  * Unit tests for GitHub API client
  */
 
-// Import test libraries - using Deno's built-in testing module
+// Import test libraries
 import {
   assertEquals,
   assertRejects,
-} from "https://deno.land/std/assert/mod.ts";
+} from "@std/assert";
 
 // Import application code
 import { GitHubAPIError, GitHubClient } from "../../../src/core/api/mod.ts";
