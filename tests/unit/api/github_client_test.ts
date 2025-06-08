@@ -3,10 +3,7 @@
  */
 
 // Import test libraries
-import {
-  assertEquals,
-  assertRejects,
-} from "@std/assert";
+import { assertEquals, assertRejects } from "@std/assert";
 
 // Import application code
 import { GitHubAPIError, GitHubClient } from "../../../src/core/api/mod.ts";

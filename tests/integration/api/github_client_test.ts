@@ -5,10 +5,7 @@
  * when explicitly enabled with the RUN_INTEGRATION_TESTS environment variable.
  */
 
-import {
-  assertEquals,
-  assertExists,
-} from "@std/assert";
+import { assertEquals, assertExists } from "@std/assert";
 import { GitHubClient } from "../../../src/core/api/mod.ts";
 
 // Only run integration tests when explicitly enabled

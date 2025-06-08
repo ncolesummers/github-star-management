@@ -5,10 +5,7 @@
  * actual implementation. They are only run when explicitly enabled.
  */
 
-import {
-  assertEquals,
-  assertStringIncludes,
-} from "@std/assert";
+import { assertEquals, assertStringIncludes } from "@std/assert";
 import { StringWriter } from "../../helpers/string_writer.ts";
 import { withTempFile } from "../../helpers/temp_file.ts";
 
