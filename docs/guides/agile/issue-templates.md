@@ -112,6 +112,9 @@ We use the following labels to organize our issues:
 - `task`: Technical implementation work
 - `documentation`: Documentation updates
 - `bug`: Something isn't working as expected
+- `dx`: Developer experience improvements
+- `technical`: Technical work without direct user impact
+- `infrastructure`: Infrastructure and tooling updates
 - `priority-high`: High priority items
 - `priority-medium`: Medium priority items
 - `priority-low`: Low priority items
