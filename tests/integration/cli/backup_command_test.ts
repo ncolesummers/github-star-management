@@ -40,7 +40,7 @@ async function setupTestCli(): Promise<{
   // Capture stdout/stderr
   const stdout = new StringWriter();
   const stderr = new StringWriter();
-  
+
   // Redirect console output
   const originalConsoleLog = console.log;
   const originalConsoleError = console.error;
@@ -50,24 +50,24 @@ async function setupTestCli(): Promise<{
   console.error = (...args: unknown[]) => {
     stderr.write(new TextEncoder().encode(args.join(" ") + "\n"));
   };
-  
+
   // Setup KV
   const kv = await openMockKv();
-  
+
   // Create command program
   const program = new Command()
     .name("star-management")
     .version("test")
     .description("GitHub Star Management");
-  
+
   // Register commands with mock client
   const githubClient = new MockGitHubClient() as unknown as GitHubClient;
   registerBackupCommands(program, githubClient);
-  
+
   // Override Deno.openKv to use our mock
   const originalOpenKv = Deno.openKv;
   Deno.openKv = () => Promise.resolve(kv as unknown as Deno.Kv);
-  
+
   // Create cleanup function
   const cleanup = () => {
     console.log = originalConsoleLog;
@@ -100,7 +100,7 @@ function cleanupTestCli(test: {
 // Run before executing the tests
 Deno.test("backup command - create", async () => {
   const test = await setupTestCli();
-  
+
   try {
     // Execute command
     await test.program.parse([
@@ -111,14 +111,14 @@ Deno.test("backup command - create", async () => {
       "--tags",
       "test,integration",
     ]);
-    
+
     // Verify output
     const output = test.stdout.toString();
     assertStringIncludes(output, "Creating backup of starred repositories");
     assertStringIncludes(output, "Backup created successfully");
     assertStringIncludes(output, "Description: Test backup");
     assertStringIncludes(output, "Tags: test, integration");
-    
+
     // Verify backup was created in KV
     const backups = [];
     for await (const entry of test.kv.list({ prefix: ["backups"] })) {
@@ -126,7 +126,7 @@ Deno.test("backup command - create", async () => {
         backups.push(entry.value);
       }
     }
-    
+
     assertEquals(backups.length, 1);
     assertEquals((backups[0] as BackupMeta).description, "Test backup");
     assertEquals((backups[0] as BackupMeta).tags, ["test", "integration"]);
@@ -137,7 +137,7 @@ Deno.test("backup command - create", async () => {
 
 Deno.test("backup command - list", async () => {
   const test = await setupTestCli();
-  
+
   try {
     // Create a backup first
     await test.program.parse([
@@ -146,13 +146,13 @@ Deno.test("backup command - list", async () => {
       "--description",
       "Test backup for list",
     ]);
-    
+
     // Clear output
     test.stdout.clear();
-    
+
     // Execute list command
     await test.program.parse(["backup", "list"]);
-    
+
     // Verify output
     const output = test.stdout.toString();
     assertStringIncludes(output, "Test backup for list");
@@ -164,7 +164,7 @@ Deno.test("backup command - list", async () => {
 
 Deno.test("backup command - get existing backup", async () => {
   const test = await setupTestCli();
-  
+
   try {
     // Create a backup first
     await test.program.parse([
@@ -173,16 +173,16 @@ Deno.test("backup command - get existing backup", async () => {
       "--description",
       "Test backup for get",
     ]);
-    
+
     // Extract ID from output
     const createOutput = test.stdout.toString();
     const idMatch = createOutput.match(/ID: ([a-zA-Z0-9-]+)/);
     assertExists(idMatch);
     const backupId = idMatch[1];
-    
+
     // Clear output
     test.stdout.clear();
-    
+
     // Execute get command
     await test.program.parse([
       "backup",
@@ -190,7 +190,7 @@ Deno.test("backup command - get existing backup", async () => {
       "--id",
       backupId,
     ]);
-    
+
     // Verify output
     const output = test.stdout.toString();
     assertStringIncludes(output, `Backup: ${backupId}`);
@@ -203,7 +203,7 @@ Deno.test("backup command - get existing backup", async () => {
 
 Deno.test("backup command - get non-existent backup", async () => {
   const test = await setupTestCli();
-  
+
   try {
     // Execute get command with non-existent ID
     await test.program.parse([
@@ -212,10 +212,13 @@ Deno.test("backup command - get non-existent backup", async () => {
       "--id",
       "non-existent-id",
     ]);
-    
+
     // Verify error output
     const errorOutput = test.stderr.toString();
-    assertStringIncludes(errorOutput, "Backup with ID 'non-existent-id' not found");
+    assertStringIncludes(
+      errorOutput,
+      "Backup with ID 'non-existent-id' not found",
+    );
   } finally {
     cleanupTestCli(test);
   }
@@ -223,7 +226,7 @@ Deno.test("backup command - get non-existent backup", async () => {
 
 Deno.test("backup command - delete", async () => {
   const test = await setupTestCli();
-  
+
   try {
     // Create a backup first
     await test.program.parse([
@@ -232,16 +235,16 @@ Deno.test("backup command - delete", async () => {
       "--description",
       "Test backup for delete",
     ]);
-    
+
     // Extract ID from output
     const createOutput = test.stdout.toString();
     const idMatch = createOutput.match(/ID: ([a-zA-Z0-9-]+)/);
     assertExists(idMatch);
     const backupId = idMatch[1];
-    
+
     // Clear output
     test.stdout.clear();
-    
+
     // Execute delete command with force to skip confirmation
     await test.program.parse([
       "backup",
@@ -250,11 +253,11 @@ Deno.test("backup command - delete", async () => {
       backupId,
       "--force",
     ]);
-    
+
     // Verify output
     const output = test.stdout.toString();
     assertStringIncludes(output, `Backup '${backupId}' deleted successfully`);
-    
+
     // Verify backup was deleted
     const backups = [];
     for await (const entry of test.kv.list({ prefix: ["backups"] })) {
@@ -262,7 +265,7 @@ Deno.test("backup command - delete", async () => {
         backups.push(entry.value);
       }
     }
-    
+
     assertEquals(backups.length, 0);
   } finally {
     cleanupTestCli(test);
@@ -272,7 +275,7 @@ Deno.test("backup command - delete", async () => {
 Deno.test("backup command - export and import", async () => {
   const test = await setupTestCli();
   const tmpFile = await Deno.makeTempFile({ suffix: ".json" });
-  
+
   try {
     // Create a backup first
     await test.program.parse([
@@ -283,16 +286,16 @@ Deno.test("backup command - export and import", async () => {
       "--tags",
       "export,test",
     ]);
-    
+
     // Extract ID from output
     const createOutput = test.stdout.toString();
     const idMatch = createOutput.match(/ID: ([a-zA-Z0-9-]+)/);
     assertExists(idMatch);
     const backupId = idMatch[1];
-    
+
     // Clear output
     test.stdout.clear();
-    
+
     // Execute export command
     await test.program.parse([
       "backup",
@@ -302,14 +305,14 @@ Deno.test("backup command - export and import", async () => {
       "--output",
       tmpFile,
     ]);
-    
+
     // Verify export output
     const exportOutput = test.stdout.toString();
     assertStringIncludes(exportOutput, "Backup exported successfully");
-    
+
     // Clear output
     test.stdout.clear();
-    
+
     // Delete the original backup
     await test.program.parse([
       "backup",
@@ -318,10 +321,10 @@ Deno.test("backup command - export and import", async () => {
       backupId,
       "--force",
     ]);
-    
+
     // Clear output
     test.stdout.clear();
-    
+
     // Execute import command
     await test.program.parse([
       "backup",
@@ -331,20 +334,20 @@ Deno.test("backup command - export and import", async () => {
       "--description",
       "Re-imported backup",
     ]);
-    
+
     // Verify import output
     const importOutput = test.stdout.toString();
     assertStringIncludes(importOutput, "Backup imported successfully");
     assertStringIncludes(importOutput, "Description: Re-imported backup");
-    
+
     // Verify new backup exists with updated description
-    const backups: Array<{description?: string}> = [];
+    const backups: Array<{ description?: string }> = [];
     for await (const entry of test.kv.list({ prefix: ["backups"] })) {
       if (entry.key.length === 3 && entry.key[2] === "meta") {
-        backups.push(entry.value as {description?: string});
+        backups.push(entry.value as { description?: string });
       }
     }
-    
+
     assertEquals(backups.length, 1);
     assertEquals(backups[0].description, "Re-imported backup");
   } finally {

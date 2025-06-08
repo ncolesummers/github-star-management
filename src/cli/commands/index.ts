@@ -1,6 +1,6 @@
 /**
  * CLI commands
- * 
+ *
  * This module exports command registration functions
  */
 
