@@ -1,6 +1,6 @@
 /**
  * Backup models
- * 
+ *
  * Type definitions for backup-related functionality
  */
 
@@ -53,17 +53,17 @@ export interface BackupService {
    * Get a specific backup by ID
    */
   getBackup(id: string): Promise<Backup | null>;
-  
+
   /**
    * Delete a backup by ID
    */
   deleteBackup(id: string): Promise<boolean>;
-  
+
   /**
    * Export a backup to a file
    */
   exportBackup(id: string, filePath: string): Promise<void>;
-  
+
   /**
    * Import a backup from a file
    */

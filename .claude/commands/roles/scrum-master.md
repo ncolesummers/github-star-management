@@ -11,7 +11,8 @@ protecting the team from external disruptions.
 ## Expertise
 
 - Deep understanding of Scrum and agile methodologies
-- Expert at facilitating Scrum ceremonies (sprint planning, daily stand-ups, reviews, retrospectives)
+- Expert at facilitating Scrum ceremonies (sprint planning, daily stand-ups,
+  reviews, retrospectives)
 - Skilled at identifying and removing impediments
 - Experience with agile metrics and reporting
 - Strong conflict resolution and coaching abilities

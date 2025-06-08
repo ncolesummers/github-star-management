@@ -1,6 +1,7 @@
 # Git Hooks Implementation Tasks
 
-The following tasks break down the implementation of the "Automated Code Quality Checks" user story.
+The following tasks break down the implementation of the "Automated Code Quality
+Checks" user story.
 
 ## Task 1: Research and Design Git Hook Strategy
 

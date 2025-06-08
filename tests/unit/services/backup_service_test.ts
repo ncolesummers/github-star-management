@@ -2,14 +2,10 @@
  * Tests for BackupService
  */
 
-import {
-  assertEquals,
-  assertExists,
-  assertRejects,
-} from "https://deno.land/std/testing/asserts.ts";
+import { assertEquals, assertExists, assertRejects } from "@std/assert";
 import { openMockKv } from "../../helpers/mock_kv.ts";
 import { BackupService } from "../../../src/core/services/backup_service.ts";
-import { Backup, BackupMeta } from "../../../src/core/models/backup.ts";
+import { Backup } from "../../../src/core/models/backup.ts";
 import { mockRepos } from "../../fixtures/repositories.ts";
 import { GitHubClient } from "../../../src/core/api/github_client.ts";
 
@@ -55,23 +51,23 @@ Deno.test("BackupService - createBackup - should overwrite existing backup when 
   const kv = await openMockKv();
   const githubClient = new MockGitHubClient() as unknown as GitHubClient;
   const service = new BackupService(kv, githubClient);
-  
+
   // Create initial backup
   const initialMeta = await service.createBackup({
     description: "Initial backup",
   });
-  
+
   // Act - create with same ID but overwrite
   const updatedMeta = await service.createBackup({
     description: "Updated backup",
     overwrite: true,
     tags: ["updated"],
   });
-  
+
   // Assert
   assertEquals(updatedMeta.id, initialMeta.id);
   assertEquals(updatedMeta.description, "Updated backup");
-  
+
   // Verify backup was updated
   const backup = await service.getBackup(updatedMeta.id);
   assertEquals(backup!.meta.description, "Updated backup");
@@ -83,14 +79,14 @@ Deno.test("BackupService - listBackups - should return all backups", async () =>
   const kv = await openMockKv();
   const githubClient = new MockGitHubClient() as unknown as GitHubClient;
   const service = new BackupService(kv, githubClient);
-  
+
   // Create a few backups
   const meta1 = await service.createBackup({ description: "Backup 1" });
   const meta2 = await service.createBackup({ description: "Backup 2" });
   const meta3 = await service.createBackup({ description: "Backup 3" });
-  
+
   console.log("Created backups with IDs:", meta1.id, meta2.id, meta3.id);
-  
+
   // Manually check KV store
   let count = 0;
   for await (const entry of kv.list({ prefix: ["backups"] })) {
@@ -98,11 +94,15 @@ Deno.test("BackupService - listBackups - should return all backups", async () =>
     count++;
   }
   console.log("Total KV entries:", count);
-  
+
   // Act
   const backups = await service.listBackups();
-  console.log("Returned backups:", backups.length, backups.map(b => b.description));
-  
+  console.log(
+    "Returned backups:",
+    backups.length,
+    backups.map((b) => b.description),
+  );
+
   // Assert
   assertEquals(backups.length, 3);
   // We can only test length since order might vary due to async operations
@@ -113,10 +113,10 @@ Deno.test("BackupService - getBackup - should return null for non-existent backu
   const kv = await openMockKv();
   const githubClient = new MockGitHubClient() as unknown as GitHubClient;
   const service = new BackupService(kv, githubClient);
-  
+
   // Act
   const backup = await service.getBackup("non-existent-id");
-  
+
   // Assert
   assertEquals(backup, null);
 });
@@ -126,16 +126,16 @@ Deno.test("BackupService - deleteBackup - should delete an existing backup", asy
   const kv = await openMockKv();
   const githubClient = new MockGitHubClient() as unknown as GitHubClient;
   const service = new BackupService(kv, githubClient);
-  
+
   // Create a backup to delete
   const meta = await service.createBackup();
-  
+
   // Act
   const result = await service.deleteBackup(meta.id);
-  
+
   // Assert
   assertEquals(result, true);
-  
+
   // Verify backup is deleted
   const backup = await service.getBackup(meta.id);
   assertEquals(backup, null);
@@ -146,10 +146,10 @@ Deno.test("BackupService - deleteBackup - should return false for non-existent b
   const kv = await openMockKv();
   const githubClient = new MockGitHubClient() as unknown as GitHubClient;
   const service = new BackupService(kv, githubClient);
-  
+
   // Act
   const result = await service.deleteBackup("non-existent-id");
-  
+
   // Assert
   assertEquals(result, false);
 });
@@ -160,20 +160,20 @@ Deno.test("BackupService - exportBackup - should export backup to a file", async
   const githubClient = new MockGitHubClient() as unknown as GitHubClient;
   const service = new BackupService(kv, githubClient);
   const tmpFile = await Deno.makeTempFile({ suffix: ".json" });
-  
+
   // Create a backup to export
   const meta = await service.createBackup({
     description: "Backup to export",
   });
-  
+
   try {
     // Act
     await service.exportBackup(meta.id, tmpFile);
-    
+
     // Assert
     const fileContent = await Deno.readTextFile(tmpFile);
     const exported = JSON.parse(fileContent) as Backup;
-    
+
     assertEquals(exported.meta.id, meta.id);
     assertEquals(exported.meta.description, "Backup to export");
     assertEquals(exported.repositories.length, mockRepos.length);
@@ -189,7 +189,7 @@ Deno.test("BackupService - exportBackup - should throw for non-existent backup",
   const githubClient = new MockGitHubClient() as unknown as GitHubClient;
   const service = new BackupService(kv, githubClient);
   const tmpFile = await Deno.makeTempFile();
-  
+
   try {
     // Act & Assert
     await assertRejects(
@@ -211,7 +211,7 @@ Deno.test("BackupService - importBackup - should import backup from a file", asy
   const githubClient = new MockGitHubClient() as unknown as GitHubClient;
   const service = new BackupService(kv, githubClient);
   const tmpFile = await Deno.makeTempFile({ suffix: ".json" });
-  
+
   // Create a file with backup data
   const backup = {
     meta: {
@@ -224,17 +224,17 @@ Deno.test("BackupService - importBackup - should import backup from a file", asy
     },
     repositories: mockRepos,
   };
-  
+
   await Deno.writeTextFile(tmpFile, JSON.stringify(backup));
-  
+
   try {
     // Act
     const meta = await service.importBackup(tmpFile, { overwrite: true });
-    
+
     // Assert
     assertEquals(meta.id, "imported-backup");
     assertEquals(meta.description, "Imported backup");
-    
+
     // Verify backup was imported
     const imported = await service.getBackup(meta.id);
     assertExists(imported);

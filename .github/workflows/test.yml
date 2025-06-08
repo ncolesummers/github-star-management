@@ -38,7 +38,7 @@ jobs:
         run: deno check src/**/*.ts
 
       - name: Run unit tests
-        run: deno test --allow-env tests/unit/
+        run: deno test --allow-env --allow-read --allow-write tests/unit/
 
       - name: Run integration tests
         if: matrix.os == 'ubuntu-latest' && github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -49,7 +49,7 @@ jobs:
 
       - name: Generate coverage
         if: matrix.os == 'ubuntu-latest' && matrix.deno-version == 'v1.x'
-        run: deno test --allow-env --coverage=coverage tests/unit/
+        run: deno test --allow-env --allow-read --allow-write --coverage=coverage tests/unit/
 
       - name: Create coverage report
         if: matrix.os == 'ubuntu-latest' && matrix.deno-version == 'v1.x'

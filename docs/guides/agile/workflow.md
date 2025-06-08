@@ -1,10 +1,13 @@
 # Agile Workflow Guide
 
-This document outlines our agile workflow process for the GitHub Star Management project.
+This document outlines our agile workflow process for the GitHub Star Management
+project.
 
 ## Agile Methodology
 
-We follow a simplified Scrum approach with elements of Kanban for our development process. This provides structure while maintaining flexibility for our open-source project.
+We follow a simplified Scrum approach with elements of Kanban for our
+development process. This provides structure while maintaining flexibility for
+our open-source project.
 
 ## Sprints
 
@@ -21,9 +24,11 @@ We follow a simplified Scrum approach with elements of Kanban for our developmen
 
 ## Workflow Stages
 
-Our workflow follows these stages, represented as columns in our GitHub project board:
+Our workflow follows these stages, represented as columns in our GitHub project
+board:
 
-1. **Backlog**: All issues that have been created but not yet planned for a sprint
+1. **Backlog**: All issues that have been created but not yet planned for a
+   sprint
 2. **Ready**: Issues that have been refined and are ready to be worked on
 3. **In Progress**: Issues currently being worked on
 4. **Review**: Code is completed and under review
@@ -54,7 +59,8 @@ Our workflow follows these stages, represented as columns in our GitHub project 
 - Create a branch using the naming convention:
   - `feature/issue-number-short-description`
   - `fix/issue-number-short-description`
-- Make incremental commits following our [Commit Guidelines](../../../CONTRIBUTING.md#commit-guidelines)
+- Make incremental commits following our
+  [Commit Guidelines](../../../CONTRIBUTING.md#commit-guidelines)
 
 ### 4. Code Review
 
@@ -107,7 +113,9 @@ We track the following metrics:
 
 ## Adapting the Process
 
-This process is not set in stone. We encourage team members to suggest improvements during sprint retrospectives. Our goal is to maintain a process that:
+This process is not set in stone. We encourage team members to suggest
+improvements during sprint retrospectives. Our goal is to maintain a process
+that:
 
 - Supports quality code development
 - Provides visibility into project progress

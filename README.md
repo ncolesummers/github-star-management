@@ -5,7 +5,8 @@ A modern CLI tool for managing your GitHub stars, written in Deno TypeScript.
 ## Features
 
 - 🧹 **Star Cleanup**: Remove stars from archived or outdated repositories
-- 💾 **Star Backup & Restore**: Export and import your stars, with local Deno KV storage
+- 💾 **Star Backup & Restore**: Export and import your stars, with local Deno KV
+  storage
 - 📚 **Star Categorization**: Generate topical lists of your starred
   repositories
 - 📊 **Star Reporting**: Generate statistics and insights about your starred
@@ -132,6 +133,7 @@ Options:
 ```
 
 Example usage:
+
 ```bash
 # Create a new backup
 deno task start backup create --description "My backup" --tags work,important

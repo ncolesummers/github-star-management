@@ -1,6 +1,6 @@
 /**
  * Example of using the backup service
- * 
+ *
  * This is a simple example to demonstrate how to use the backup service
  * in a real-world application.
  */
@@ -44,8 +44,12 @@ async function main() {
     console.log("\nGetting backup details...");
     const backup = await backupService.getBackup(meta.id);
     if (backup) {
-      console.log(`Backup ${backup.meta.id} has ${backup.repositories.length} repositories`);
-      console.log(`First repository: ${backup.repositories[0]?.full_name || "none"}`);
+      console.log(
+        `Backup ${backup.meta.id} has ${backup.repositories.length} repositories`,
+      );
+      console.log(
+        `First repository: ${backup.repositories[0]?.full_name || "none"}`,
+      );
     } else {
       console.log("Backup not found");
     }

@@ -1,10 +1,12 @@
 # Backup Command Guide
 
-The `backup` command provides functionality for managing GitHub star backups using Deno KV, a built-in key-value database in Deno.
+The `backup` command provides functionality for managing GitHub star backups
+using Deno KV, a built-in key-value database in Deno.
 
 ## Overview
 
 The backup command lets you:
+
 - Create backups of your starred repositories
 - List available backups
 - View details of specific backups
@@ -12,7 +14,8 @@ The backup command lets you:
 - Export backups to files for sharing
 - Import backups from files
 
-All backup data is stored locally using Deno KV, which provides a persistent storage solution without requiring external databases.
+All backup data is stored locally using Deno KV, which provides a persistent
+storage solution without requiring external databases.
 
 ## Command Usage
 
@@ -118,25 +121,31 @@ Backups are stored locally using Deno KV with the following structure:
 ```
 
 Each backup includes:
+
 - Metadata (ID, creation date, description, tags, etc.)
 - Complete repository data for all starred repositories
 
 ## Backup ID Format
 
 Backup IDs follow the format:
+
 - `backup-YYYY-MM-DD` for backups created with `--overwrite`
-- `backup-YYYY-MM-DD-XXXXXX` for new backups (where XXXXXX is a unique identifier)
+- `backup-YYYY-MM-DD-XXXXXX` for new backups (where XXXXXX is a unique
+  identifier)
 - `backup-YYYY-MM-DD-imported-XXXXXX` for imported backups
 
 ## Best Practices
 
-1. **Regular Backups**: Create backups regularly to maintain a history of your stars
+1. **Regular Backups**: Create backups regularly to maintain a history of your
+   stars
 
-2. **Descriptive Names**: Use the `--description` option to provide context for each backup
+2. **Descriptive Names**: Use the `--description` option to provide context for
+   each backup
 
 3. **Categorization**: Use tags to categorize backups for better organization
 
-4. **External Storage**: Export important backups to files and store them in a secure location
+4. **External Storage**: Export important backups to files and store them in a
+   secure location
 
 5. **Cleanup**: Delete old or unnecessary backups to save space
 
@@ -177,11 +186,13 @@ comm -23 stars-jan-list.txt stars-jun-list.txt > removed-stars.txt
 
 ### Common Issues
 
-1. **Missing GitHub Token**: Set the `GITHUB_TOKEN` environment variable or use the `--token` option
+1. **Missing GitHub Token**: Set the `GITHUB_TOKEN` environment variable or use
+   the `--token` option
 
 2. **Import Fails**: Check if the import file is a valid JSON backup file
 
-3. **Permission Errors**: Ensure Deno has permission to access the KV store by running with `--allow-env --allow-read --allow-write`
+3. **Permission Errors**: Ensure Deno has permission to access the KV store by
+   running with `--allow-env --allow-read --allow-write`
 
 ### Debugging
 
