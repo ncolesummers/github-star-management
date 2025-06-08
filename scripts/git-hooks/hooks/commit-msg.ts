@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run --allow-read --allow-env
+#!/usr/bin/env -S deno run --allow-read
 
 /**
  * commit-msg hook
@@ -11,10 +11,10 @@
  */
 
 import { validateCommitMessage } from "../utils/conventional_commits.ts";
-import { readCommitMessage } from "../utils/git.ts";
+import { logHookExecution, readCommitMessage } from "../utils/git.ts";
 
 async function commitMsgHook(): Promise<void> {
-  console.log("🔍 Validating commit message format...");
+  logHookExecution("commit-msg");
 
   // Get the commit message file path from args
   const commitMsgFile = Deno.args[0];

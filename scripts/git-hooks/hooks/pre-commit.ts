@@ -9,9 +9,10 @@
  */
 
 import { checkFormatting, checkLinting } from "../utils/file_checks.ts";
+import { logHookExecution } from "../utils/git.ts";
 
 async function preCommitHook(): Promise<void> {
-  console.log("🔍 Running pre-commit checks...");
+  logHookExecution("pre-commit");
 
   // Check formatting
   const formattingPassed = await checkFormatting();

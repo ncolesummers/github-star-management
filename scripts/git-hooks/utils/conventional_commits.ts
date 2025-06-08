@@ -58,11 +58,16 @@ export function validateCommitMessage(
     };
   }
 
-  const { type, scope, description } = match.groups as {
+  const { type, scope, breaking, description } = match.groups as {
     type: string;
     scope?: string;
+    breaking?: string;
     description: string;
   };
+
+  // Note: The breaking change flag is captured for future use
+  // but not currently used in validation
+  const _isBreakingChange = !!breaking;
 
   // Validate commit type
   if (!ALLOWED_TYPES.includes(type)) {

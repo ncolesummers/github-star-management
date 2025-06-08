@@ -61,33 +61,9 @@ export async function readCommitMessage(filePath: string): Promise<string> {
 }
 
 /**
- * Run git hook with the given arguments
+ * Log hook execution
  * @param hookName Name of the hook
- * @returns Promise that resolves when the hook is complete
  */
-export function runGitHook(hookName: string): Promise<void> {
+export function logHookExecution(hookName: string): void {
   console.log(`Running ${hookName} hook...`);
-
-  try {
-    // Process hook-specific logic
-    switch (hookName) {
-      case "pre-commit":
-        // Will be implemented separately
-        break;
-      case "commit-msg":
-        // Will be implemented separately
-        break;
-      case "pre-push":
-        // Will be implemented separately
-        break;
-      default:
-        console.error(`Unknown hook: ${hookName}`);
-        Deno.exit(1);
-    }
-  } catch (error) {
-    console.error(`Error in ${hookName} hook: ${error.message}`);
-    Deno.exit(1);
-  }
-
-  return Promise.resolve();
 }

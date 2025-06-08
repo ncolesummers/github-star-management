@@ -8,9 +8,10 @@
  */
 
 import { runTests } from "../utils/file_checks.ts";
+import { logHookExecution } from "../utils/git.ts";
 
 async function prePushHook(): Promise<void> {
-  console.log("🧪 Running tests before push...");
+  logHookExecution("pre-push");
 
   // Run the test suite
   const testsPass = await runTests();

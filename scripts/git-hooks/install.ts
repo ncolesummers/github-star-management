@@ -10,7 +10,7 @@
  */
 
 import { getGitRoot } from "./utils/git.ts";
-import * as path from "https://deno.land/std/path/mod.ts";
+import * as path from "https://deno.land/std@0.203.0/path/mod.ts";
 
 // Define the hooks to install
 const HOOKS = [
