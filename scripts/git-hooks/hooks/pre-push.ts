@@ -5,10 +5,29 @@
  *
  * This hook runs before pushing to a remote repository and:
  * - Runs the full test suite to ensure all tests pass
+ * - Verifies documentation is updated for changed files
  */
 
 import { runTests } from "../utils/file_checks.ts";
-import { logHookExecution } from "../utils/git.ts";
+import { getStagedFiles, logHookExecution } from "../utils/git.ts";
+
+async function verifyDocsUpdated(): Promise<boolean> {
+  // Simple heuristic: if code files are changed, check if docs/ or README.md is staged
+  const changed = await getStagedFiles();
+  const codeChanged = changed.some((f) =>
+    f.endsWith(".ts") || f.endsWith(".js")
+  );
+  const docsChanged = changed.some(
+    (f) => f.startsWith("docs/") || f === "README.md",
+  );
+  if (codeChanged && !docsChanged) {
+    console.error(
+      "\u26A0\uFE0F Code changes detected but no documentation updates staged.",
+    );
+    return false;
+  }
+  return true;
+}
 
 async function prePushHook(): Promise<void> {
   logHookExecution("pre-push");
@@ -26,13 +45,24 @@ async function prePushHook(): Promise<void> {
     Deno.exit(1);
   }
 
-  console.log("✅ All tests passed. Proceeding with push.");
+  // Verify documentation is updated for changed files
+  const docsOk = await verifyDocsUpdated();
+  if (!docsOk) {
+    console.error(
+      "❌ Please update documentation for your code changes (docs/ or README.md)",
+    );
+    Deno.exit(1);
+  }
+
+  console.log("✅ All pre-push checks passed. Proceeding with push.");
 }
 
 // Run the hook
-if (import.meta.main) {
+if (import.meta && (import.meta as { main?: boolean }).main) {
   prePushHook().catch((error) => {
     console.error(`Error in pre-push hook: ${error.message}`);
-    Deno.exit(1);
+    // Deno global is always available in Deno runtime
+    // @ts-ignore: Optional chaining used for compatibility with environments where Deno might not be available
+    Deno.exit?.(1);
   });
 }
