@@ -8,6 +8,8 @@ standards for the GitHub Star Management project.
 - **pre-commit**: Runs before creating a commit
   - Checks formatting of staged TypeScript files using `deno fmt --check`
   - Lints staged TypeScript files using `deno lint`
+  - Scans for accidental API tokens/secrets in staged files
+  - Prevents debug statements (`console.log`, `debugger`) in staged files
 
 - **commit-msg**: Validates commit messages
   - Enforces [Conventional Commits](https://www.conventionalcommits.org/) format
@@ -19,6 +21,13 @@ standards for the GitHub Star Management project.
 
 - **pre-push**: Runs before pushing to a remote repository
   - Runs the full test suite to ensure all tests pass
+  - Verifies documentation is updated for changed files (requires docs/ or README.md to be staged if code changes are present)
+
+- **post-checkout**: Runs after checking out a branch
+  - Detects if `deno.lock` has changed and notifies the developer to update dependencies if needed
+
+- **post-merge**: Runs after merging a branch
+  - Notifies developers about dependency changes if `deno.lock` was updated
 
 ## Installation
 

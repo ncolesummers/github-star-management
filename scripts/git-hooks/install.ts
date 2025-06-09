@@ -17,6 +17,8 @@ const HOOKS = [
   "pre-commit",
   "commit-msg",
   "pre-push",
+  "post-checkout",
+  "post-merge",
 ];
 
 async function installHooks(): Promise<void> {
