@@ -26,7 +26,9 @@ export async function scanForSecrets(): Promise<boolean> {
           found = true;
         }
       }
-    } catch (_) {}
+    } catch (_) {
+      // Silently continue if file cannot be read
+    }
   }
   return !found;
 }
@@ -46,7 +48,9 @@ export async function scanForDebugStatements(): Promise<boolean> {
         console.error(`debugger statement found in ${file}`);
         found = true;
       }
-    } catch (_) {}
+    } catch (_) {
+      // Silently continue if file cannot be read
+    }
   }
   return !found;
 }

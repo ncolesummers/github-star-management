@@ -18,7 +18,9 @@ async function postCheckoutHook(): Promise<void> {
   const { stdout } = await process.output();
   const changedFiles = new TextDecoder().decode(stdout).split("\n");
   if (changedFiles.includes("deno.lock")) {
-    console.log("\u26A0\uFE0F deno.lock has changed. Consider running 'deno cache' or 'deno task check' to update dependencies.");
+    console.log(
+      "\u26A0\uFE0F deno.lock has changed. Consider running 'deno cache' or 'deno task check' to update dependencies.",
+    );
   }
 }
 

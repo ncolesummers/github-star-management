@@ -21,10 +21,12 @@ standards for the GitHub Star Management project.
 
 - **pre-push**: Runs before pushing to a remote repository
   - Runs the full test suite to ensure all tests pass
-  - Verifies documentation is updated for changed files (requires docs/ or README.md to be staged if code changes are present)
+  - Verifies documentation is updated for changed files (requires docs/ or
+    README.md to be staged if code changes are present)
 
 - **post-checkout**: Runs after checking out a branch
-  - Detects if `deno.lock` has changed and notifies the developer to update dependencies if needed
+  - Detects if `deno.lock` has changed and notifies the developer to update
+    dependencies if needed
 
 - **post-merge**: Runs after merging a branch
   - Notifies developers about dependency changes if `deno.lock` was updated

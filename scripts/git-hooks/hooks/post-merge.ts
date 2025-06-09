@@ -17,7 +17,9 @@ async function postMergeHook(): Promise<void> {
   const { stdout } = await process.output();
   const changedFiles = new TextDecoder().decode(stdout).split("\n");
   if (changedFiles.includes("deno.lock")) {
-    console.log("\u26A0\uFE0F deno.lock has changed in this merge. Please review dependency updates and run 'deno cache' or 'deno task check'.");
+    console.log(
+      "\u26A0\uFE0F deno.lock has changed in this merge. Please review dependency updates and run 'deno cache' or 'deno task check'.",
+    );
   }
 }
 

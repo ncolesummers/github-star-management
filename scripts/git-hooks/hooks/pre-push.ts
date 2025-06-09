@@ -9,12 +9,14 @@
  */
 
 import { runTests } from "../utils/file_checks.ts";
-import { logHookExecution, getStagedFiles } from "../utils/git.ts";
+import { getStagedFiles, logHookExecution } from "../utils/git.ts";
 
 async function verifyDocsUpdated(): Promise<boolean> {
   // Simple heuristic: if code files are changed, check if docs/ or README.md is staged
   const changed = await getStagedFiles();
-  const codeChanged = changed.some((f) => f.endsWith(".ts") || f.endsWith(".js"));
+  const codeChanged = changed.some((f) =>
+    f.endsWith(".ts") || f.endsWith(".js")
+  );
   const docsChanged = changed.some(
     (f) => f.startsWith("docs/") || f === "README.md",
   );
@@ -56,11 +58,11 @@ async function prePushHook(): Promise<void> {
 }
 
 // Run the hook
-if (import.meta && (import.meta as any).main) {
+if (import.meta && (import.meta as { main?: boolean }).main) {
   prePushHook().catch((error) => {
     console.error(`Error in pre-push hook: ${error.message}`);
     // Deno global is always available in Deno runtime
-    // @ts-ignore
+    // @ts-ignore: Optional chaining used for compatibility with environments where Deno might not be available
     Deno.exit?.(1);
   });
 }
